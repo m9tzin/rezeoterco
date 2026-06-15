@@ -89,7 +89,7 @@ type TercoData = {
 
 Cada mistério segue esta ordem:
 
-1. Credo (apenas no primeiro mistério, no início do terço completo)
+1. Credo (sempre no início de cada sessão, independente do mistério escolhido)
 2. Pai Nosso inicial
 3. 3× Ave Maria (pelas virtudes fé, esperança e caridade)
 4. Glória
