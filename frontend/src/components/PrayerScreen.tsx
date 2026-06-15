@@ -46,17 +46,17 @@ export function PrayerScreen({
     [onStepChange]
   )
 
-  function handleNext() {
+  const handleNext = useCallback(() => {
     if (canGoNext(index, total)) {
       go(nextIndex(index))
     } else {
       onComplete()
     }
-  }
+  }, [index, total, go, onComplete])
 
-  function handlePrev() {
+  const handlePrev = useCallback(() => {
     if (canGoPrev(index)) go(prevIndex(index))
-  }
+  }, [index, go])
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -71,7 +71,7 @@ export function PrayerScreen({
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  })
+  }, [handleNext, handlePrev])
 
   return (
     <div className="min-h-screen bg-[#FAF9F6] flex flex-col max-w-[680px] mx-auto px-6">
