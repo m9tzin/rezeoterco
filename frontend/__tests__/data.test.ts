@@ -45,3 +45,36 @@ describe('Terço Mariano', () => {
     })
   })
 })
+
+import { misericordiaData } from '@/data/misericordia'
+
+describe('Terço da Divina Misericórdia', () => {
+  it('has exactly 1 mystery sequence', () => {
+    expect(misericordiaData.misterios).toHaveLength(1)
+  })
+
+  it('the single sequence has exactly 64 etapas', () => {
+    expect(misericordiaData.misterios[0].etapas).toHaveLength(64)
+  })
+
+  it('each etapa has non-empty label and texto', () => {
+    misericordiaData.misterios[0].etapas.forEach((etapa) => {
+      expect(etapa.label.length).toBeGreaterThan(0)
+      expect(etapa.texto.length).toBeGreaterThan(0)
+    })
+  })
+
+  it('has 50 misericordia-paixao etapas (5 decades × 10)', () => {
+    const paixao = misericordiaData.misterios[0].etapas.filter(
+      (e) => e.tipo === 'misericordia-paixao'
+    )
+    expect(paixao).toHaveLength(50)
+  })
+
+  it('has 5 misericordia-oferta etapas (one per decade)', () => {
+    const oferta = misericordiaData.misterios[0].etapas.filter(
+      (e) => e.tipo === 'misericordia-oferta'
+    )
+    expect(oferta).toHaveLength(5)
+  })
+})
