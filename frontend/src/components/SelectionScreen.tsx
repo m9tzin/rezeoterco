@@ -20,11 +20,22 @@ export function SelectionScreen({
   const activeTerco = TERCOS[activeTipo]
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] flex flex-col items-center px-4 py-10">
-      <h1 className="text-3xl font-serif text-[#1C1C1E] mb-2 tracking-tight">
-        Terço
-      </h1>
-      <p className="text-[#6B7280] text-sm mb-8">Escolha o terço e o mistério</p>
+    <div className="min-h-screen bg-[#FAF9F6] flex flex-col items-center px-4 pb-12">
+      {/* Hero */}
+      <div className="w-full max-w-lg text-center pt-14 pb-10 mb-2">
+        <div className="text-3xl text-[#8B7355] mb-4 select-none tracking-widest">✦ ✝ ✦</div>
+        <h1 className="text-4xl font-serif text-[#1C1C1E] tracking-tight mb-3">
+          Reze o Terço
+        </h1>
+        <p className="text-[#6B7280] text-base leading-relaxed max-w-sm mx-auto">
+          Guia passo a passo para rezar o terço com calma e devoção.
+        </p>
+        <div className="mt-8 flex items-center gap-3 justify-center">
+          <div className="h-px flex-1 bg-[#E5E7EB]" />
+          <span className="text-[#8B7355] text-xs uppercase tracking-widest">escolha abaixo</span>
+          <div className="h-px flex-1 bg-[#E5E7EB]" />
+        </div>
+      </div>
 
       {/* Resume banner */}
       {savedProgress && (

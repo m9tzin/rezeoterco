@@ -67,6 +67,10 @@ export default function Home() {
     setView('selection')
   }
 
+  function handleBack() {
+    setView('selection')
+  }
+
   function handleFontChange(size: FontSize) {
     setFontSize(size)
     savePreferences({ fontSize: size })
@@ -94,6 +98,7 @@ export default function Home() {
           onFontChange={handleFontChange}
           onComplete={handleComplete}
           onStepChange={handleStepChange}
+          onBack={handleBack}
         />
       )}
       {view === 'complete' && <CompletionScreen onRestart={handleRestart} />}
