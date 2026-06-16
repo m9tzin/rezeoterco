@@ -1,19 +1,21 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import type { Misterio, FontSize } from '@/data/types'
+import type { Misterio, FontSize, TipoTerco } from '@/data/types'
 import { canGoNext, canGoPrev, nextIndex, prevIndex } from '@/lib/navigation'
+import { RosaryBeads } from './RosaryBeads'
 
 const FONT_CLASS: Record<FontSize, string> = {
-  normal: 'text-lg',
-  grande: 'text-2xl',
-  'muito-grande': 'text-3xl',
+  normal: 'text-2xl',
+  grande: 'text-3xl',
+  'muito-grande': 'text-4xl',
 }
 
 const SIZES: FontSize[] = ['normal', 'grande', 'muito-grande']
 
 type Props = {
   misterio: Misterio
+  tipo: TipoTerco
   initialIndex: number
   fontSize: FontSize
   onFontChange: (size: FontSize) => void
@@ -24,6 +26,7 @@ type Props = {
 
 export function PrayerScreen({
   misterio,
+  tipo,
   initialIndex,
   fontSize,
   onFontChange,
@@ -50,11 +53,8 @@ export function PrayerScreen({
   )
 
   const handleNext = useCallback(() => {
-    if (canGoNext(index, total)) {
-      go(nextIndex(index))
-    } else {
-      onComplete()
-    }
+    if (canGoNext(index, total)) go(nextIndex(index))
+    else onComplete()
   }, [index, total, go, onComplete])
 
   const handlePrev = useCallback(() => {
@@ -63,14 +63,8 @@ export function PrayerScreen({
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'ArrowRight' || e.key === ' ') {
-        e.preventDefault()
-        handleNext()
-      }
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault()
-        handlePrev()
-      }
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); handleNext() }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); handlePrev() }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -80,84 +74,90 @@ export function PrayerScreen({
   const percent = Math.round(((index + 1) / total) * 100)
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] flex flex-col max-w-[680px] mx-auto px-6">
-      {/* Header */}
-      <div className="pt-5 pb-4 border-b border-[#E5E7EB]">
-        {/* Top row: back + mystery name */}
-        <div className="flex items-center gap-3 mb-2">
+    <div className="min-h-screen bg-cream flex flex-col items-center px-4 pb-40">
+
+      {/* ── Header ── */}
+      <div className="w-full max-w-[560px] pt-6 pb-3">
+        <div className="flex items-center justify-between mb-4">
           <button
             onClick={onBack}
-            aria-label="Voltar à página inicial"
-            className="text-[#6B7280] hover:text-[#8B7355] transition-colors text-sm flex items-center gap-1 shrink-0"
+            className="font-cormorant text-base text-terco-muted hover:text-brown transition-colors"
           >
             ← Início
           </button>
-          <p className="text-xs text-[#6B7280] uppercase tracking-widest truncate">
+          <p className="font-cormorant italic text-base text-terco-muted truncate ml-4">
             {misterio.titulo}
           </p>
         </div>
 
-        {/* Etapa label */}
-        <p className="text-sm text-[#8B7355] font-medium mb-2">{etapa.label}</p>
-
-        {/* Progress bar + percentage */}
-        <div className="flex items-center gap-3 mb-3">
-          <div className="flex-1 h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
+        {/* Progress bar */}
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-[3px] bg-parchment rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#8B7355] rounded-full transition-all duration-300"
+              className="h-full bg-gold rounded-full transition-all duration-300"
               style={{ width: `${percent}%` }}
             />
           </div>
-          <span className="text-xs text-[#6B7280] tabular-nums w-9 text-right">{percent}%</span>
-        </div>
-
-        {/* Font size controls */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-[#6B7280]">Tamanho da fonte</span>
-          <div className="flex gap-1 ml-auto">
-            <button
-              onClick={() => fontIndex > 0 && onFontChange(SIZES[fontIndex - 1])}
-              disabled={fontIndex === 0}
-              aria-label="Diminuir fonte"
-              className="px-2.5 py-1 rounded border border-[#E5E7EB] text-[#6B7280] text-xs font-bold hover:border-[#8B7355] disabled:opacity-30 transition-colors bg-white"
-            >
-              A−
-            </button>
-            <button
-              onClick={() => fontIndex < SIZES.length - 1 && onFontChange(SIZES[fontIndex + 1])}
-              disabled={fontIndex === SIZES.length - 1}
-              aria-label="Aumentar fonte"
-              className="px-2.5 py-1 rounded border border-[#E5E7EB] text-[#6B7280] text-sm font-bold hover:border-[#8B7355] disabled:opacity-30 transition-colors bg-white"
-            >
-              A+
-            </button>
-          </div>
+          <span className="font-cormorant text-sm text-terco-muted tabular-nums w-8 text-right">
+            {percent}%
+          </span>
         </div>
       </div>
 
-      {/* Prayer text */}
-      <div className="flex-1 flex items-center py-8">
-        <p
-          className={`font-serif text-[#1C1C1E] leading-relaxed whitespace-pre-line transition-opacity duration-150 ${FONT_CLASS[fontSize]} ${visible ? 'opacity-100' : 'opacity-0'}`}
-        >
+      {/* ── Rosary beads (Marian only) ── */}
+      {tipo === 'mariano' && <RosaryBeads currentIndex={index} />}
+
+      {/* ── Prayer card ── */}
+      <div
+        className={`w-full max-w-[560px] bg-white border border-parchment rounded-sm shadow-[0_2px_16px_rgba(92,61,46,0.07)] px-7 py-6 mb-5 transition-opacity duration-150 ${visible ? 'opacity-100' : 'opacity-0'}`}
+      >
+        {/* Eyebrow: step label */}
+        <p className="font-cormorant italic text-base text-gold mb-3">
+          {etapa.label}
+        </p>
+        {/* Prayer text */}
+        <p className={`font-garamond text-terco-text leading-[1.85] whitespace-pre-line ${FONT_CLASS[fontSize]}`}>
           {etapa.texto}
         </p>
       </div>
 
-      {/* Navigation */}
-      <div className="py-6 flex gap-3">
+      {/* ── Font size controls ── */}
+      <div className="flex items-center gap-3 w-full max-w-[560px] mb-2">
+        <span className="font-cormorant text-base text-terco-muted">Tamanho da fonte</span>
+        <div className="flex gap-1 ml-auto">
+          <button
+            onClick={() => fontIndex > 0 && onFontChange(SIZES[fontIndex - 1])}
+            disabled={fontIndex === 0}
+            aria-label="Diminuir fonte"
+            className="px-3 py-1 border border-parchment text-terco-muted font-cormorant text-base hover:border-gold disabled:opacity-30 transition-colors bg-white rounded-sm"
+          >
+            A−
+          </button>
+          <button
+            onClick={() => fontIndex < SIZES.length - 1 && onFontChange(SIZES[fontIndex + 1])}
+            disabled={fontIndex === SIZES.length - 1}
+            aria-label="Aumentar fonte"
+            className="px-3 py-1 border border-parchment text-terco-muted font-cormorant text-base hover:border-gold disabled:opacity-30 transition-colors bg-white rounded-sm"
+          >
+            A+
+          </button>
+        </div>
+      </div>
+
+      {/* ── Navigation (fixed) ── */}
+      <div className="fixed bottom-12 left-0 right-0 flex justify-center gap-3 px-4">
         <button
           onClick={handlePrev}
           disabled={!canGoPrev(index)}
-          className="px-5 py-4 rounded-lg border border-[#E5E7EB] text-[#6B7280] font-medium disabled:opacity-30 hover:border-[#8B7355] transition-colors"
+          className="font-cormorant text-lg px-6 py-3 border border-gold bg-parchment text-brown disabled:opacity-30 hover:bg-[#e0d5bd] transition-colors rounded-sm active:scale-[0.97]"
         >
-          ← Anterior
+          ← Voltar
         </button>
         <button
           onClick={handleNext}
-          className="flex-1 py-4 rounded-lg bg-[#8B7355] text-white font-medium text-lg hover:bg-[#7a6347] transition-colors"
+          className="font-cormorant text-lg flex-1 max-w-[280px] py-3 bg-brown text-cream hover:bg-brown-dark transition-colors rounded-sm active:scale-[0.97]"
         >
-          {canGoNext(index, total) ? 'Próximo →' : 'Concluir ✓'}
+          {canGoNext(index, total) ? 'Avançar →' : 'Finalizar ✝'}
         </button>
       </div>
     </div>

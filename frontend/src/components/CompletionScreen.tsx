@@ -6,19 +6,32 @@ type Props = {
 
 export function CompletionScreen({ onRestart }: Props) {
   return (
-    <div className="min-h-screen bg-[#FAF9F6] flex flex-col items-center justify-center px-6 text-center">
-      <div className="mb-6 text-5xl select-none">✝</div>
-      <h2 className="text-2xl font-serif text-[#1C1C1E] mb-3">
-        Terço concluído
+    <div className="min-h-screen bg-cream flex flex-col items-center justify-center px-6 text-center pb-16">
+      <svg
+        width="28"
+        height="44"
+        viewBox="0 0 28 44"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        className="text-gold mx-auto mb-6"
+        aria-hidden="true"
+      >
+        <line x1="14" y1="1" x2="14" y2="43" />
+        <line x1="2" y1="13" x2="26" y2="13" />
+      </svg>
+      <h2 className="font-cormorant font-light text-3xl text-brown tracking-wide uppercase mb-3">
+        Terço Concluído
       </h2>
-      <p className="text-[#6B7280] text-base mb-10 max-w-sm leading-relaxed">
-        Que Nossa Senhora interceda por você e por todos os seus pedidos.
+      <p className="font-garamond italic text-terco-muted text-lg mb-10 max-w-sm leading-relaxed">
+        &ldquo;Rezar o terço é pegar na mão de Maria e ir com ela ao encontro de Jesus.&rdquo;
       </p>
       <button
         onClick={onRestart}
-        className="w-full max-w-xs py-4 rounded-lg bg-[#8B7355] text-white font-medium text-lg hover:bg-[#7a6347] transition-colors"
+        className="font-cormorant text-base tracking-wide px-8 py-3 bg-gold text-cream hover:bg-gold-dark transition-colors rounded-sm active:scale-[0.97]"
       >
-        Rezar outro terço
+        Rezar Novamente
       </button>
     </div>
   )
