@@ -204,7 +204,16 @@ export function PrayerScreen({
             }`}
             aria-label={isLast ? 'Finalizar terço' : 'Próxima etapa'}
           >
-            {isLast ? 'Finalizar ✝' : 'Avançar →'}
+            {isLast ? (
+              <span className="flex items-center justify-center gap-2">
+                Finalizar
+                <svg width="10" height="16" viewBox="0 0 28 44" fill="none"
+                  stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                  <line x1="14" y1="1" x2="14" y2="43" />
+                  <line x1="2" y1="13" x2="26" y2="13" />
+                </svg>
+              </span>
+            ) : 'Avançar →'}
           </button>
         </div>
       </div>
