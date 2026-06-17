@@ -17,7 +17,7 @@ const RM = 6    // medal connector
 // the way around, leaving an equal gap at the connector.
 type BeadDef = { etapaIndex: number; type: 'pater' | 'ave'; x: number; y: number }
 
-const GAP = 0.09   // radians of gap at the connector (both sides combined = 2·GAP)
+const GAP = 0.18   // radians of gap at the connector — needs to be > (RM+RP)/RX ≈ 0.12 to avoid overlap
 const RING: BeadDef[] = []
 for (let i = 0; i < 55; i++) {
   const θ = (3 * Math.PI) / 2 + GAP + (i * (2 * Math.PI - 2 * GAP)) / 55
@@ -93,9 +93,10 @@ export function RosaryBeads({ currentIndex }: Props) {
         )
       })}
 
-      {/* ── Medal connector ── */}
+      {/* ── Medal connector (etapa 5 = Glória, rezada na medalha) ── */}
+      {isCur(5) && <circle cx={CX} cy={MEDAL_Y} r={RM + 5} fill={C.glow} />}
       <circle cx={CX} cy={MEDAL_Y} r={RM}
-        fill={currentIndex > 5 ? C.gold : C.parchment}
+        fill={currentIndex === 5 ? C.red : currentIndex > 5 ? C.gold : C.parchment}
         stroke={C.gold} strokeWidth="1.5" />
 
       {/* ── Tail beads ── */}
