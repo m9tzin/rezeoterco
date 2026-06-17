@@ -81,30 +81,32 @@ export default function Home() {
   const misterio = TERCOS[tipo].misterios.find((m) => m.id === misterioId)
 
   return (
-    <>
-      {view === 'selection' && (
-        <SelectionScreen
-          savedProgress={savedProgress}
-          onSelectMisterio={handleSelectMisterio}
-          onResume={handleResume}
-          onDismissProgress={handleDismissProgress}
-        />
-      )}
-      {view === 'praying' && misterio && (
-        <PrayerScreen
-          misterio={misterio}
-          tipo={tipo}
-          initialIndex={etapaIndex}
-          fontSize={fontSize}
-          onFontChange={handleFontChange}
-          onComplete={handleComplete}
-          onStepChange={handleStepChange}
-          onBack={handleBack}
-        />
-      )}
-      {view === 'complete' && <CompletionScreen onRestart={handleRestart} />}
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1">
+        {view === 'selection' && (
+          <SelectionScreen
+            savedProgress={savedProgress}
+            onSelectMisterio={handleSelectMisterio}
+            onResume={handleResume}
+            onDismissProgress={handleDismissProgress}
+          />
+        )}
+        {view === 'praying' && misterio && (
+          <PrayerScreen
+            misterio={misterio}
+            tipo={tipo}
+            initialIndex={etapaIndex}
+            fontSize={fontSize}
+            onFontChange={handleFontChange}
+            onComplete={handleComplete}
+            onStepChange={handleStepChange}
+            onBack={handleBack}
+          />
+        )}
+        {view === 'complete' && <CompletionScreen onRestart={handleRestart} />}
+      </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 py-1 text-center bg-cream/90 backdrop-blur-sm border-t border-parchment/60">
+      <footer className="py-1 text-center border-t border-parchment/60">
         <p className="text-xs text-terco-muted/60 font-geist min-h-[36px] flex items-center justify-center gap-2">
           &copy; 2026 Matheus Marinho
           <span aria-hidden="true">·</span>
@@ -121,6 +123,6 @@ export default function Home() {
           </a>
         </p>
       </footer>
-    </>
+    </div>
   )
 }

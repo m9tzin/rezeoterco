@@ -64,7 +64,7 @@ export function SelectionScreen({
   const todayId = getTodayMisterioId()
 
   return (
-    <div className="min-h-screen bg-cream flex flex-col items-center px-4 pb-20">
+    <div className="bg-cream flex flex-col items-center px-4 pb-8">
       {/* Hero */}
       <div className="w-full max-w-lg text-center pt-14 pb-8">
         <svg
