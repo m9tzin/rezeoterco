@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import type { TipoTerco, Progress } from '@/data/types'
 import { TERCOS, TERCO_LIST } from '@/data/index'
 
@@ -10,9 +11,17 @@ type Props = {
   onDismissProgress: () => void
 }
 
+const CruzSVG = (
+  <svg width="22" height="34" viewBox="0 0 28 44" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+    <line x1="14" y1="1" x2="14" y2="43" />
+    <line x1="2" y1="13" x2="26" y2="13" />
+  </svg>
+)
+
 const MISTERIO_VISUAL: Record<
   string,
-  { simbolo: string; tema: string; dias: string; cor: string }
+  { simbolo: ReactNode; tema: string; dias: string; cor: string }
 > = {
   gozosos: {
     simbolo: '✿',
@@ -27,7 +36,7 @@ const MISTERIO_VISUAL: Record<
     cor: '#3b6ea5',
   },
   dolorosos: {
-    simbolo: '✝',
+    simbolo: CruzSVG,
     tema: 'Sofrimento · Paixão',
     dias: 'Terça · Sexta',
     cor: '#8b2020',
