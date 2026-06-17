@@ -32,13 +32,14 @@ for (let i = 0; i < 55; i++) {
 }
 
 // ── Tail beads (hanging below the connector) ──────────────────────────────────
-// Order top-to-bottom: medal → pater (etapa 1) → 3 aves (etapas 2-4) → cross (etapa 0)
+// Order top-to-bottom: medal → ave 3 (etapa 4) → ave 2 (3) → ave 1 (2) → pater (1) → cross (0)
+// This matches the physical rosary: from the cross upward you pray Pai Nosso then 3 Ave Marias.
 const T0 = MEDAL_Y + 20   // first tail bead center y
 const TAIL: BeadDef[] = [
-  { etapaIndex: 1, type: 'pater', x: CX, y: T0 },
-  { etapaIndex: 2, type: 'ave',   x: CX, y: T0 + 19 },
-  { etapaIndex: 3, type: 'ave',   x: CX, y: T0 + 35 },
-  { etapaIndex: 4, type: 'ave',   x: CX, y: T0 + 51 },
+  { etapaIndex: 4, type: 'ave',   x: CX, y: T0 },
+  { etapaIndex: 3, type: 'ave',   x: CX, y: T0 + 19 },
+  { etapaIndex: 2, type: 'ave',   x: CX, y: T0 + 35 },
+  { etapaIndex: 1, type: 'pater', x: CX, y: T0 + 51 },
 ]
 const CROSS_Y = T0 + 70    // center of the cross
 const SVG_H = CROSS_Y + 16 // total SVG height
