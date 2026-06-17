@@ -132,7 +132,11 @@ export function PrayerScreen({
       </div>
 
       {/* ── Rosary beads (Marian only) ── */}
-      {tipo === 'mariano' && <RosaryBeads currentIndex={index} />}
+      {tipo === 'mariano' && (
+        <div className="w-full mb-4">
+          <RosaryBeads currentIndex={index} />
+        </div>
+      )}
 
       {/* ── Prayer card ── */}
       <div

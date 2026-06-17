@@ -1,48 +1,71 @@
 'use client'
 
 // ── Geometry ──────────────────────────────────────────────────────────────────
-const CX = 150, CY = 130      // ellipse center
-const RX = 110, RY = 80       // ellipse semi-axes
-const MEDAL_Y = CY + RY       // 210 – connector at bottom of ring
+const CX = 150, CY = 146
+const RX = 98,  RY = 130      // portrait oval ~1:1.33
+const MEDAL_Y = CY + RY       // 276 – medal at bottom of ring
 
 // Bead radii
 const RP = 7.5  // pater
 const RA = 5    // ave
-const RM = 6    // medal connector
+const RM = 8    // medal connector (slightly larger to stand out)
 
-// ── Ring beads (55): 5 decades × (1 pater + 10 aves) ─────────────────────────
-// Flipped-y formula: x = cx + rx·cos(θ), y = cy - ry·sin(θ)
-// This makes increasing θ = clockwise on screen.
-// Starting just clockwise past the bottom connector (θ = 3π/2) and going all
-// the way around, leaving an equal gap at the connector.
+// ── Arc-length parameterization ───────────────────────────────────────────────
+// Beads and symbols spaced by arc length so they distribute evenly on the oval.
+const GAP = 0.22  // radians gap at connector (must be > (RM+RP)/RX ≈ 0.16)
+const θ_START = (3 * Math.PI) / 2 + GAP
+const ARC_SPAN = 2 * Math.PI - 2 * GAP
+
+const N = 2000
+const _arcs: number[] = [0]
+for (let i = 1; i <= N; i++) {
+  const θ1 = θ_START + ((i - 1) / N) * ARC_SPAN
+  const θ2 = θ_START + (i / N) * ARC_SPAN
+  const dx = RX * (Math.cos(θ2) - Math.cos(θ1))
+  const dy = RY * (Math.sin(θ2) - Math.sin(θ1))
+  _arcs.push(_arcs[i - 1] + Math.hypot(dx, dy))
+}
+const TOTAL_ARC = _arcs[N]
+
+function arcToTheta(target: number): number {
+  let lo = 0, hi = N
+  while (lo < hi - 1) {
+    const mid = (lo + hi) >> 1
+    if (_arcs[mid] < target) lo = mid; else hi = mid
+  }
+  const span = _arcs[hi] - _arcs[lo]
+  const t = span === 0 ? 0 : (target - _arcs[lo]) / span
+  const θlo = θ_START + (lo / N) * ARC_SPAN
+  const θhi = θ_START + (hi / N) * ARC_SPAN
+  return θlo + t * (θhi - θlo)
+}
+
+// ── Ring: 55 beads = 5 decades × (1 pater + 10 aves) ────────────────────────
 type BeadDef = { etapaIndex: number; type: 'pater' | 'ave'; x: number; y: number }
 
-const GAP = 0.18   // radians of gap at the connector — needs to be > (RM+RP)/RX ≈ 0.12 to avoid overlap
 const RING: BeadDef[] = []
 for (let i = 0; i < 55; i++) {
-  const θ = (3 * Math.PI) / 2 + GAP + (i * (2 * Math.PI - 2 * GAP)) / 55
+  const θ = arcToTheta((i + 0.5) * TOTAL_ARC / 55)
   const x = CX + RX * Math.cos(θ)
   const y = CY - RY * Math.sin(θ)
-  const d = Math.floor(i / 11) // decade 0-4
-  const p = i % 11              // position within decade
-  let etapaIndex: number, type: 'pater' | 'ave'
-  if (p === 0) { etapaIndex = 7 + d * 14; type = 'pater' }
-  else          { etapaIndex = 8 + d * 14 + (p - 1); type = 'ave' }
+  const d = Math.floor(i / 11)
+  const p = i % 11
+  const etapaIndex = p === 0 ? 7 + d * 14 : 8 + d * 14 + (p - 1)
+  const type: 'pater' | 'ave' = p === 0 ? 'pater' : 'ave'
   RING.push({ etapaIndex, type, x, y })
 }
 
 // ── Tail beads (hanging below the connector) ──────────────────────────────────
-// Order top-to-bottom: medal → ave 3 (etapa 4) → ave 2 (3) → ave 1 (2) → pater (1) → cross (0)
-// This matches the physical rosary: from the cross upward you pray Pai Nosso then 3 Ave Marias.
-const T0 = MEDAL_Y + 20   // first tail bead center y
+// From medal downward: Ave 3 → Ave 2 → Ave 1 → Pai Nosso → Cross
+const T0 = MEDAL_Y + 22
 const TAIL: BeadDef[] = [
   { etapaIndex: 4, type: 'ave',   x: CX, y: T0 },
-  { etapaIndex: 3, type: 'ave',   x: CX, y: T0 + 19 },
-  { etapaIndex: 2, type: 'ave',   x: CX, y: T0 + 35 },
-  { etapaIndex: 1, type: 'pater', x: CX, y: T0 + 51 },
+  { etapaIndex: 3, type: 'ave',   x: CX, y: T0 + 20 },
+  { etapaIndex: 2, type: 'ave',   x: CX, y: T0 + 40 },
+  { etapaIndex: 1, type: 'pater', x: CX, y: T0 + 60 },
 ]
-const CROSS_Y = T0 + 70    // center of the cross
-const SVG_H = CROSS_Y + 16 // total SVG height
+const CROSS_Y = T0 + 84
+const SVG_H   = CROSS_Y + 18
 
 // ── Colors ────────────────────────────────────────────────────────────────────
 const C = {
@@ -64,8 +87,13 @@ export function RosaryBeads({ currentIndex }: Props) {
     return C.parchment
   }
   const outline = (b: BeadDef) => b.type === 'pater' ? C.brown : C.gold
-  const isCur = (idx: number) => idx === currentIndex
+
+  const isCur  = (idx: number) => idx === currentIndex
   const isDone = (idx: number) => idx < currentIndex
+
+  // Medal is active for etapa 5 (Glória after intro) or etapa 76 (Salve Rainha end)
+  const medalCur  = currentIndex === 5 || currentIndex === 76
+  const medalDone = currentIndex > 5 && currentIndex !== 76
 
   return (
     <svg
@@ -75,7 +103,7 @@ export function RosaryBeads({ currentIndex }: Props) {
       className="mx-auto"
       aria-hidden="true"
     >
-      {/* ── Strings ── */}
+      {/* ── String: ring + tail ── */}
       <ellipse cx={CX} cy={CY} rx={RX} ry={RY}
         fill="none" stroke={C.string} strokeWidth="1.5" />
       <line x1={CX} y1={MEDAL_Y} x2={CX} y2={CROSS_Y + 10}
@@ -93,10 +121,10 @@ export function RosaryBeads({ currentIndex }: Props) {
         )
       })}
 
-      {/* ── Medal connector (etapa 5 = Glória, rezada na medalha) ── */}
-      {isCur(5) && <circle cx={CX} cy={MEDAL_Y} r={RM + 5} fill={C.glow} />}
+      {/* ── Medal connector (Glória after intro / Salve Rainha at the end) ── */}
+      {medalCur && <circle cx={CX} cy={MEDAL_Y} r={RM + 5} fill={C.glow} />}
       <circle cx={CX} cy={MEDAL_Y} r={RM}
-        fill={currentIndex === 5 ? C.red : currentIndex > 5 ? C.gold : C.parchment}
+        fill={medalCur ? C.red : medalDone ? C.gold : C.parchment}
         stroke={C.gold} strokeWidth="1.5" />
 
       {/* ── Tail beads ── */}
