@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, EB_Garamond } from 'next/font/google'
 import { GeistSans } from 'geist/font/sans'
+import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 const cormorant = Cormorant_Garamond({
@@ -42,7 +43,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="pt-BR"
       className={`${cormorant.variable} ${ebGaramond.variable} ${GeistSans.variable}`}
     >
-      <body className="font-garamond bg-cream text-terco-text">{children}</body>
+      <body className="font-garamond bg-cream text-terco-text">
+        {children}
+        <Analytics />
+      </body>
     </html>
   )
 }
