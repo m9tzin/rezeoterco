@@ -82,9 +82,14 @@ export function SelectionScreen({
           <line x1="2" y1="13" x2="26" y2="13" />
         </svg>
 
-        <h1 className="font-cormorant font-light text-[2.5rem] leading-tight text-brown tracking-widest uppercase mb-3">
-          Reze o Terço
-        </h1>
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <h1 className="font-cormorant font-light text-[2.5rem] leading-tight text-brown tracking-widest uppercase">
+            Reze o Terço
+          </h1>
+          <span className="font-geist text-[10px] text-terco-muted/60 border border-terco-muted/25 rounded px-1.5 py-0.5 tracking-widest uppercase self-start mt-3">
+            beta
+          </span>
+        </div>
         <p className="font-garamond italic text-terco-muted text-lg leading-relaxed max-w-[18rem] mx-auto">
           Guia passo a passo para rezar o terço com calma e devoção.
         </p>
