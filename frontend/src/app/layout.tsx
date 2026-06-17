@@ -20,13 +20,13 @@ const ebGaramond = EB_Garamond({
 })
 
 export const metadata: Metadata = {
-  title: 'Terço',
+  title: 'Reze o Terço',
   description: 'Reze o terço de maneira simples, onde estiver.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Terço',
+    title: 'Reze o Terço',
   },
 }
 
