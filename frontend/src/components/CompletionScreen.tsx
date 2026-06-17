@@ -6,7 +6,7 @@ type Props = {
 
 export function CompletionScreen({ onRestart }: Props) {
   return (
-    <div className="min-h-screen bg-cream flex flex-col items-center justify-center px-6 text-center pb-20">
+    <div className="bg-cream flex flex-col items-center justify-center px-6 text-center py-16">
       {/* Decorative ornament */}
       <div className="flex items-center gap-4 mb-8">
         <div className="h-px w-12 bg-gold/40" aria-hidden="true" />
