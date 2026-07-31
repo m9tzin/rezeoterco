@@ -40,11 +40,16 @@ export function selectBestPortugueseVoice(
     .sort((a, b) => b.score - a.score || a.index - b.index)[0]?.voice
 }
 
-export function useSpeechSynthesis(text: string) {
+type SpeechSynthesisOptions = {
+  onEnd?: () => void
+}
+
+export function useSpeechSynthesis(text: string, options: SpeechSynthesisOptions = {}) {
   const [isSupported, setIsSupported] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
+  const onEndRef = useRef(options.onEnd)
 
   useEffect(() => {
     const supported =
@@ -73,11 +78,15 @@ export function useSpeechSynthesis(text: string) {
     }
   }, [])
 
+  useEffect(() => {
+    onEndRef.current = options.onEnd
+  }, [options.onEnd])
+
   const stop = useCallback(() => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
 
-    window.speechSynthesis.cancel()
     utteranceRef.current = null
+    window.speechSynthesis.cancel()
     setIsSpeaking(false)
   }, [])
 
@@ -90,6 +99,7 @@ export function useSpeechSynthesis(text: string) {
       return
     }
 
+    utteranceRef.current = null
     window.speechSynthesis.cancel()
 
     const utterance = new window.SpeechSynthesisUtterance(text)
@@ -100,10 +110,15 @@ export function useSpeechSynthesis(text: string) {
     utterance.rate = NATURAL_RATE
     utterance.pitch = NATURAL_PITCH
     utterance.onend = () => {
+      if (utteranceRef.current !== utterance) return
+
       utteranceRef.current = null
       setIsSpeaking(false)
+      onEndRef.current?.()
     }
     utterance.onerror = () => {
+      if (utteranceRef.current !== utterance) return
+
       utteranceRef.current = null
       setIsSpeaking(false)
     }
