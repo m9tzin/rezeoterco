@@ -37,11 +37,13 @@ export function PrayerScreen({
 }: Props) {
   const [index, setIndex] = useState(initialIndex)
   const [visible, setVisible] = useState(true)
+  const [isContinuousListening, setIsContinuousListening] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
+  const continuousRef = useRef(false)
+  const pendingAutoSpeakRef = useRef(false)
 
   const etapa = misterio.etapas[index]
   const total = misterio.etapas.length
-  const speech = useSpeechSynthesis(etapa.texto)
 
   const go = useCallback(
     (newIndex: number) => {
@@ -55,16 +57,73 @@ export function PrayerScreen({
     [onStepChange]
   )
 
+  const stopContinuous = useCallback(() => {
+    continuousRef.current = false
+    pendingAutoSpeakRef.current = false
+    setIsContinuousListening(false)
+  }, [])
+
+  const handleSpeechEnd = useCallback(() => {
+    if (!continuousRef.current) return
+
+    if (canGoNext(index, total)) {
+      pendingAutoSpeakRef.current = true
+      go(nextIndex(index))
+      return
+    }
+
+    stopContinuous()
+  }, [go, index, stopContinuous, total])
+
+  const speech = useSpeechSynthesis(etapa.texto, { onEnd: handleSpeechEnd })
+  const { isSupported, isSpeaking, speak, stop } = speech
+  const isListening = isContinuousListening || isSpeaking
+
+  useEffect(() => {
+    if (!pendingAutoSpeakRef.current || !continuousRef.current) return
+
+    pendingAutoSpeakRef.current = false
+    speak()
+  }, [index, speak])
+
+  useEffect(
+    () => () => {
+      continuousRef.current = false
+      pendingAutoSpeakRef.current = false
+    },
+    []
+  )
+
+  const handleToggleSpeech = useCallback(() => {
+    if (isListening) {
+      stopContinuous()
+      stop()
+      return
+    }
+
+    continuousRef.current = true
+    setIsContinuousListening(true)
+    speak()
+  }, [isListening, speak, stop, stopContinuous])
+
   const handleNext = useCallback(() => {
-    speech.stop()
+    stopContinuous()
+    stop()
     if (canGoNext(index, total)) go(nextIndex(index))
     else onComplete()
-  }, [index, total, go, onComplete, speech])
+  }, [index, total, go, onComplete, stop, stopContinuous])
 
   const handlePrev = useCallback(() => {
-    speech.stop()
+    stopContinuous()
+    stop()
     if (canGoPrev(index)) go(prevIndex(index))
-  }, [index, go, speech])
+  }, [index, go, stop, stopContinuous])
+
+  const handleBack = useCallback(() => {
+    stopContinuous()
+    stop()
+    onBack()
+  }, [onBack, stop, stopContinuous])
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -90,7 +149,7 @@ export function PrayerScreen({
       <div className="w-full max-w-[560px] pt-5 pb-3">
         <div className="flex items-center justify-between mb-5">
           <button
-            onClick={onBack}
+            onClick={handleBack}
             className="flex items-center gap-1.5 font-cormorant text-base text-terco-muted hover:text-brown transition-colors min-h-[44px] pr-4"
             aria-label="Voltar ao início"
           >
@@ -145,9 +204,9 @@ export function PrayerScreen({
       {/* ── Prayer card ── */}
       <div
         ref={cardRef}
-        data-speaking={speech.isSpeaking}
+        data-speaking={isListening}
         className={`w-full max-w-[560px] bg-white border rounded-sm px-7 py-7 mb-5 transition-all duration-150 ${
-          speech.isSpeaking
+          isListening
             ? 'border-gold shadow-[0_0_0_3px_rgba(154,123,63,0.16),0_2px_20px_rgba(92,61,46,0.12)]'
             : 'border-parchment shadow-[0_2px_20px_rgba(92,61,46,0.09)]'
         } ${
@@ -156,7 +215,7 @@ export function PrayerScreen({
       >
         {/* Step label */}
         <p className="font-cormorant font-semibold text-base text-gold tracking-wide mb-3 uppercase flex items-center gap-2">
-          {speech.isSpeaking && (
+          {isListening && (
             <span
               className="inline-block h-2 w-2 rounded-full bg-gold"
               aria-hidden="true"
@@ -183,12 +242,12 @@ export function PrayerScreen({
         </span>
         <div className="flex gap-1.5 ml-auto">
           <button
-            onClick={speech.toggle}
-            disabled={!speech.isSupported}
-            aria-pressed={speech.isSpeaking}
-            aria-label={speech.isSpeaking ? 'Parar leitura em voz alta' : 'Ler oração em voz alta'}
+            onClick={handleToggleSpeech}
+            disabled={!isSupported}
+            aria-pressed={isListening}
+            aria-label={isListening ? 'Parar leitura contínua' : 'Iniciar leitura contínua'}
             className={`min-h-[44px] px-4 flex items-center justify-center border font-cormorant text-base transition-colors rounded-sm disabled:opacity-30 ${
-              speech.isSpeaking
+              isListening
                 ? 'border-gold bg-gold text-cream'
                 : 'border-parchment bg-white text-terco-muted hover:border-gold hover:text-brown'
             }`}
