@@ -29,6 +29,20 @@ describe('progress storage', () => {
     expect(loadProgress()).toBeNull()
   })
 
+  it('returns null when saved progress is not valid JSON', () => {
+    localStorage.setItem('terco-progress', '{')
+    expect(loadProgress()).toBeNull()
+  })
+
+  it('returns null when saved progress has an invalid shape', () => {
+    localStorage.setItem(
+      'terco-progress',
+      JSON.stringify({ tipo: 'mariano', misterioId: 'gozosos', etapaIndex: -1 })
+    )
+
+    expect(loadProgress()).toBeNull()
+  })
+
   it('clears saved progress', () => {
     saveProgress(mockProgress)
     clearProgress()
@@ -50,6 +64,12 @@ describe('preferences storage', () => {
   })
 
   it('returns default preferences when nothing saved', () => {
+    expect(loadPreferences()).toEqual({ fontSize: 'normal' })
+  })
+
+  it('returns default preferences when saved preferences are invalid', () => {
+    localStorage.setItem('terco-preferences', JSON.stringify({ fontSize: 'gigante' }))
+
     expect(loadPreferences()).toEqual({ fontSize: 'normal' })
   })
 })
