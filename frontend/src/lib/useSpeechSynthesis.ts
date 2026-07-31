@@ -2,10 +2,15 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-export function useSpeechSynthesis(text: string) {
+type SpeechSynthesisOptions = {
+  onEnd?: () => void
+}
+
+export function useSpeechSynthesis(text: string, options: SpeechSynthesisOptions = {}) {
   const [isSupported, setIsSupported] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
+  const onEndRef = useRef(options.onEnd)
 
   useEffect(() => {
     setIsSupported(
@@ -15,11 +20,15 @@ export function useSpeechSynthesis(text: string) {
     )
   }, [])
 
+  useEffect(() => {
+    onEndRef.current = options.onEnd
+  }, [options.onEnd])
+
   const stop = useCallback(() => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
 
-    window.speechSynthesis.cancel()
     utteranceRef.current = null
+    window.speechSynthesis.cancel()
     setIsSpeaking(false)
   }, [])
 
@@ -32,16 +41,22 @@ export function useSpeechSynthesis(text: string) {
       return
     }
 
+    utteranceRef.current = null
     window.speechSynthesis.cancel()
 
     const utterance = new window.SpeechSynthesisUtterance(text)
     utterance.lang = 'pt-BR'
     utterance.rate = 0.95
     utterance.onend = () => {
+      if (utteranceRef.current !== utterance) return
+
       utteranceRef.current = null
       setIsSpeaking(false)
+      onEndRef.current?.()
     }
     utterance.onerror = () => {
+      if (utteranceRef.current !== utterance) return
+
       utteranceRef.current = null
       setIsSpeaking(false)
     }
