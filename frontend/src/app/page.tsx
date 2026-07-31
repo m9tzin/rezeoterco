@@ -68,6 +68,9 @@ export default function Home() {
   }
 
   function handleBack() {
+    const progress: Progress = { tipo, misterioId, etapaIndex }
+    saveProgress(progress)
+    setSavedProgress(progress)
     setView('selection')
   }
 
