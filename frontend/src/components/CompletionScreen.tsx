@@ -30,7 +30,7 @@ export function CompletionScreen({ onRestart }: Props) {
         <line x1="2" y1="13" x2="26" y2="13" />
       </svg>
 
-      <h2 className="font-cormorant font-light text-4xl text-brown tracking-widest uppercase mb-2">
+      <h2 className="font-cormorant font-semibold text-[2.75rem] leading-tight text-brown tracking-widest uppercase mb-2">
         Terço Concluído
       </h2>
       <p className="font-cormorant text-gold text-base tracking-[0.2em] mb-10">
