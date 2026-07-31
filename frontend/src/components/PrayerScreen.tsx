@@ -109,7 +109,7 @@ export function PrayerScreen({
             </svg>
             Início
           </button>
-          <p className="font-cormorant italic text-base text-terco-muted truncate ml-4 max-w-[200px]">
+          <p className="font-cormorant font-semibold text-lg text-brown truncate ml-4 max-w-[240px]">
             {misterio.titulo}
           </p>
         </div>
@@ -155,7 +155,7 @@ export function PrayerScreen({
         }`}
       >
         {/* Step label */}
-        <p className="font-cormorant italic text-sm text-gold tracking-wide mb-3 uppercase flex items-center gap-2">
+        <p className="font-cormorant font-semibold text-base text-gold tracking-wide mb-3 uppercase flex items-center gap-2">
           {speech.isSpeaking && (
             <span
               className="inline-block h-2 w-2 rounded-full bg-gold"
