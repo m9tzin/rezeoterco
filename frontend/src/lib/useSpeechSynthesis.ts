@@ -2,17 +2,75 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+const NATURAL_RATE = 0.9
+const NATURAL_PITCH = 1
+
+const QUALITY_NAME_PATTERN =
+  /\b(neural|natural|premium|enhanced|luciana|francisca|maria|felipe|daniel|helena|joana|ines|inês|raquel)\b/i
+const ROBOTIC_NAME_PATTERN = /\b(default|generic|compact|standard|basic|robot|synthetic|espeak|festival)\b/i
+
+function normalizeLang(lang: string): string {
+  return lang.toLowerCase().replace('_', '-')
+}
+
+function voiceScore(voice: SpeechSynthesisVoice): number {
+  const lang = normalizeLang(voice.lang)
+  const name = voice.name.toLowerCase()
+  let score = 0
+
+  if (lang === 'pt-br') score += 1000
+  else if (lang.startsWith('pt-br')) score += 950
+  else if (lang.startsWith('pt-')) score += 700
+  else if (lang === 'pt') score += 600
+  else return -1
+
+  if (voice.localService) score += 100
+  if (QUALITY_NAME_PATTERN.test(name)) score += 60
+  if (ROBOTIC_NAME_PATTERN.test(name)) score -= 80
+
+  return score
+}
+
+export function selectBestPortugueseVoice(
+  voices: SpeechSynthesisVoice[]
+): SpeechSynthesisVoice | undefined {
+  return voices
+    .map((voice, index) => ({ voice, index, score: voiceScore(voice) }))
+    .filter((candidate) => candidate.score >= 0)
+    .sort((a, b) => b.score - a.score || a.index - b.index)[0]?.voice
+}
+
 export function useSpeechSynthesis(text: string) {
   const [isSupported, setIsSupported] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
 
   useEffect(() => {
-    setIsSupported(
+    const supported =
       typeof window !== 'undefined' &&
-        'speechSynthesis' in window &&
-        'SpeechSynthesisUtterance' in window
-    )
+      'speechSynthesis' in window &&
+      'SpeechSynthesisUtterance' in window
+    setIsSupported(supported)
+
+    if (!supported) return undefined
+
+    const synth = window.speechSynthesis
+    const loadVoices = () => {
+      setVoices(typeof synth.getVoices === 'function' ? synth.getVoices() : [])
+    }
+
+    loadVoices()
+
+    if (typeof synth.addEventListener === 'function') {
+      synth.addEventListener('voiceschanged', loadVoices)
+      return () => synth.removeEventListener('voiceschanged', loadVoices)
+    }
+
+    synth.onvoiceschanged = loadVoices
+    return () => {
+      if (synth.onvoiceschanged === loadVoices) synth.onvoiceschanged = null
+    }
   }, [])
 
   const stop = useCallback(() => {
@@ -35,8 +93,12 @@ export function useSpeechSynthesis(text: string) {
     window.speechSynthesis.cancel()
 
     const utterance = new window.SpeechSynthesisUtterance(text)
+    const voice = selectBestPortugueseVoice(voices)
+
+    if (voice) utterance.voice = voice
     utterance.lang = 'pt-BR'
-    utterance.rate = 0.95
+    utterance.rate = NATURAL_RATE
+    utterance.pitch = NATURAL_PITCH
     utterance.onend = () => {
       utteranceRef.current = null
       setIsSpeaking(false)
@@ -49,7 +111,7 @@ export function useSpeechSynthesis(text: string) {
     utteranceRef.current = utterance
     setIsSpeaking(true)
     window.speechSynthesis.speak(utterance)
-  }, [text])
+  }, [text, voices])
 
   const toggle = useCallback(() => {
     if (isSpeaking) {
