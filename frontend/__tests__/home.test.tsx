@@ -38,27 +38,25 @@ describe('Home prayer flow', () => {
     expect(screen.queryByText('Credo')).not.toBeInTheDocument()
   })
 
-  it('returns to the main menu from the completed prayer screen', async () => {
-    localStorage.setItem(
-      'terco-progress',
-      JSON.stringify({ tipo: 'mariano', misterioId: 'gozosos', etapaIndex: 76 })
-    )
-
+  it('starts the new devotional rosary types from the selection screen', async () => {
     render(<Home />)
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Continuar' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Terço da Libertação' }))
 
-    expect(screen.getByText('Salve Rainha')).toBeInTheDocument()
+    expect(screen.getByText('Terço da Libertação')).toBeInTheDocument()
+    expect(screen.getByText('Sinal da Cruz')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Finalizar terço' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Próxima etapa' }))
+    act(() => {
+      jest.advanceTimersByTime(150)
+    })
 
-    expect(screen.getByRole('heading', { name: 'Terço Concluído' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Menu Principal' })).toBeInTheDocument()
+    expect(await screen.findByText('Credo')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Menu Principal' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Voltar ao início' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Terço das Santas Chagas' }))
 
-    expect(screen.getByRole('heading', { name: 'Reze o Terço' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Mistérios Gozosos/ })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Terço Concluído' })).not.toBeInTheDocument()
+    expect(screen.getByText('Terço das Santas Chagas')).toBeInTheDocument()
+    expect(screen.getByText('Sinal da Cruz')).toBeInTheDocument()
   })
 })
