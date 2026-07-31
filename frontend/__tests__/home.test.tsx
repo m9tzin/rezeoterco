@@ -17,6 +17,8 @@ describe('Home prayer flow', () => {
   it('preserves current progress when returning to the selection screen', async () => {
     render(<Home />)
 
+    expect(await screen.findByText('Versículo do dia')).toBeInTheDocument()
+
     fireEvent.click(await screen.findByRole('button', { name: /Mistérios Gozosos/ }))
     expect(screen.getByText('Credo')).toBeInTheDocument()
 
