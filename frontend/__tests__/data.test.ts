@@ -49,6 +49,7 @@ describe('Terço Mariano', () => {
 })
 
 import { misericordiaData } from '@/data/misericordia'
+import { libertacaoData, santasChagasData } from '@/data/devocionais'
 
 describe('Terço da Divina Misericórdia', () => {
   it('has exactly 1 mystery sequence', () => {
@@ -123,6 +124,61 @@ describe('Terço da Divina Misericórdia', () => {
       'Deus Santo 1/3',
       'Deus Santo 2/3',
       'Deus Santo 3/3',
+    ])
+  })
+})
+
+describe('Tipos de terço disponíveis', () => {
+  it('lists all supported devotional types for selection', () => {
+    expect(TERCO_LIST.map((terco) => terco.id)).toEqual([
+      'mariano',
+      'misericordia',
+      'libertacao',
+      'santas-chagas',
+      'novena',
+    ])
+  })
+
+  it('has matching entries in the TERCOS lookup', () => {
+    TERCO_LIST.forEach((terco) => {
+      expect(TERCOS[terco.id]).toBe(terco)
+    })
+  })
+})
+
+describe('Terços devocionais', () => {
+  it('adds the Terço da Libertação as a complete selectable sequence', () => {
+    const etapas = libertacaoData.misterios[0].etapas
+
+    expect(libertacaoData.nome).toBe('Terço da Libertação')
+    expect(etapas).toHaveLength(60)
+    expect(etapas.slice(0, 4).map((etapa) => etapa.tipo)).toEqual([
+      'sinal-cruz',
+      'credo',
+      'pai-nosso',
+      'ave-maria',
+    ])
+    expect(etapas.filter((etapa) => etapa.tipo === 'conta-grande')).toHaveLength(5)
+    expect(etapas.filter((etapa) => etapa.tipo === 'conta-pequena')).toHaveLength(50)
+    expect(etapas[etapas.length - 1].tipo).toBe('salve-rainha')
+  })
+
+  it('adds the Terço das Santas Chagas as a complete selectable sequence', () => {
+    const etapas = santasChagasData.misterios[0].etapas
+
+    expect(santasChagasData.nome).toBe('Terço das Santas Chagas')
+    expect(etapas).toHaveLength(61)
+    expect(etapas.slice(0, 3).map((etapa) => etapa.tipo)).toEqual([
+      'sinal-cruz',
+      'credo',
+      'oracao-inicial',
+    ])
+    expect(etapas.filter((etapa) => etapa.tipo === 'conta-grande')).toHaveLength(5)
+    expect(etapas.filter((etapa) => etapa.tipo === 'conta-pequena')).toHaveLength(50)
+    expect(etapas.slice(-3).map((etapa) => etapa.tipo)).toEqual([
+      'oracao-final',
+      'oracao-final',
+      'oracao-final',
     ])
   })
 })

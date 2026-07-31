@@ -62,4 +62,26 @@ describe('Home prayer flow', () => {
 
     expect(await screen.findByText('Dia 2/9 — Palavra de Deus')).toBeInTheDocument()
   })
+
+  it('starts the new devotional rosary types from the selection screen', async () => {
+    render(<Home />)
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Terço da Libertação' }))
+
+    expect(screen.getByText('Terço da Libertação')).toBeInTheDocument()
+    expect(screen.getByText('Sinal da Cruz')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Próxima etapa' }))
+    act(() => {
+      jest.advanceTimersByTime(150)
+    })
+
+    expect(await screen.findByText('Credo')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Voltar ao início' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Terço das Santas Chagas' }))
+
+    expect(screen.getByText('Terço das Santas Chagas')).toBeInTheDocument()
+    expect(screen.getByText('Sinal da Cruz')).toBeInTheDocument()
+  })
 })

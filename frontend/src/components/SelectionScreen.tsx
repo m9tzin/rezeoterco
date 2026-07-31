@@ -115,7 +115,7 @@ export function SelectionScreen({
         </svg>
 
         <div className="flex items-center justify-center gap-2 mb-3">
-          <h1 className="font-cormorant font-light text-[2.5rem] leading-tight text-brown tracking-widest uppercase">
+          <h1 className="font-cormorant font-semibold text-[2.75rem] leading-tight text-brown tracking-widest uppercase">
             Reze o Terço
           </h1>
           <span className="font-geist text-[10px] text-terco-muted/60 border border-terco-muted/25 rounded px-1.5 py-0.5 tracking-widest uppercase self-start mt-3">
@@ -164,7 +164,7 @@ export function SelectionScreen({
 
       {/* Terço type selector */}
       <div className="w-full max-w-lg mb-7">
-        <p className="font-cormorant italic text-sm text-terco-muted/80 mb-3 tracking-wide">
+        <p className="font-cormorant font-semibold text-base text-terco-muted/80 mb-3 tracking-wide">
           Tipo de devoção
         </p>
         <div className="flex gap-2 flex-wrap">
@@ -195,7 +195,7 @@ export function SelectionScreen({
       {hasMultipleOptions && (
         <div className="w-full max-w-lg">
           <div className="flex items-baseline justify-between mb-4">
-            <p className="font-cormorant italic text-base text-terco-muted">
+            <p className="font-cormorant font-semibold text-lg text-terco-muted">
               {activeTipo === 'novena' ? 'Escolha a novena' : 'Escolha o mistério'}
             </p>
             {activeTipo === 'mariano' && (
@@ -241,7 +241,7 @@ export function SelectionScreen({
                   {/* Text */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <p className="font-cormorant text-brown text-xl leading-snug">
+                      <p className="font-cormorant font-semibold text-brown text-2xl leading-snug">
                         {misterio.titulo}
                       </p>
                       {isToday && (

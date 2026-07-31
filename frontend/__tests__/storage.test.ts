@@ -67,6 +67,18 @@ describe('progress storage', () => {
 
     expect(loadProgress()).toEqual(updated)
   })
+
+  it('loads progress for devotional rosary types', () => {
+    const updated: Progress = {
+      tipo: 'santas-chagas',
+      misterioId: 'santas-chagas',
+      etapaIndex: 12,
+    }
+
+    saveProgress(updated)
+
+    expect(loadProgress()).toEqual(updated)
+  })
 })
 
 describe('preferences storage', () => {

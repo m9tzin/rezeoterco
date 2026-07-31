@@ -1,6 +1,12 @@
-export type TipoTerco = 'mariano' | 'misericordia' | 'novena'
+export type TipoTerco =
+  | 'mariano'
+  | 'misericordia'
+  | 'libertacao'
+  | 'santas-chagas'
+  | 'novena'
 
 export type TipoEtapa =
+  | 'sinal-cruz'
   | 'credo'
   | 'pai-nosso'
   | 'ave-maria'
@@ -12,6 +18,10 @@ export type TipoEtapa =
   | 'misericordia-oferta'
   | 'misericordia-paixao'
   | 'misericordia-final'
+  | 'oracao-inicial'
+  | 'conta-grande'
+  | 'conta-pequena'
+  | 'oracao-final'
   | 'novena-dia'
 
 export type Etapa = {

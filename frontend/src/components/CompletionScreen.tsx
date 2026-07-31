@@ -30,7 +30,7 @@ export function CompletionScreen({ onRestart }: Props) {
         <line x1="2" y1="13" x2="26" y2="13" />
       </svg>
 
-      <h2 className="font-cormorant font-light text-4xl text-brown tracking-widest uppercase mb-2">
+      <h2 className="font-cormorant font-semibold text-[2.75rem] leading-tight text-brown tracking-widest uppercase mb-2">
         Terço Concluído
       </h2>
       <p className="font-cormorant text-gold text-base tracking-[0.2em] mb-10">
@@ -45,12 +45,20 @@ export function CompletionScreen({ onRestart }: Props) {
         </p>
       </div>
 
-      <button
-        onClick={onRestart}
-        className="font-cormorant text-base tracking-widest uppercase px-10 min-h-[52px] bg-brown text-cream hover:bg-brown-dark transition-colors rounded-sm active:scale-[0.97] shadow-[0_2px_12px_rgba(92,61,46,0.2)]"
-      >
-        Rezar Novamente
-      </button>
+      <div className="flex flex-col gap-3 w-full max-w-sm">
+        <button
+          onClick={onRestart}
+          className="font-cormorant text-base tracking-widest uppercase px-10 min-h-[52px] bg-brown text-cream hover:bg-brown-dark transition-colors rounded-sm active:scale-[0.97] shadow-[0_2px_12px_rgba(92,61,46,0.2)]"
+        >
+          Menu Principal
+        </button>
+        <button
+          onClick={onRestart}
+          className="font-cormorant text-base tracking-widest uppercase px-10 min-h-[52px] border border-gold/60 text-brown hover:bg-parchment transition-colors rounded-sm active:scale-[0.97]"
+        >
+          Rezar Novamente
+        </button>
+      </div>
     </div>
   )
 }
