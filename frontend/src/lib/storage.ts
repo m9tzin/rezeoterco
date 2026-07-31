@@ -4,7 +4,7 @@ const PROGRESS_KEY = 'terco-progress'
 const PREFS_KEY = 'terco-preferences'
 
 const DEFAULT_PREFERENCES: Preferences = { fontSize: 'normal' }
-const TERCO_IDS = new Set(['mariano', 'misericordia'])
+const TERCO_IDS = new Set(['mariano', 'misericordia', 'novena'])
 const FONT_SIZES = new Set(['normal', 'grande', 'muito-grande'])
 
 function isProgress(value: unknown): value is Progress {

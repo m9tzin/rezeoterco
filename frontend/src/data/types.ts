@@ -1,4 +1,4 @@
-export type TipoTerco = 'mariano' | 'misericordia'
+export type TipoTerco = 'mariano' | 'misericordia' | 'novena'
 
 export type TipoEtapa =
   | 'credo'
@@ -12,6 +12,7 @@ export type TipoEtapa =
   | 'misericordia-oferta'
   | 'misericordia-paixao'
   | 'misericordia-final'
+  | 'novena-dia'
 
 export type Etapa = {
   tipo: TipoEtapa
