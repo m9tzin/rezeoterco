@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import type { Misterio, FontSize, TipoTerco } from '@/data/types'
 import { canGoNext, canGoPrev, nextIndex, prevIndex } from '@/lib/navigation'
 import { useSpeechSynthesis } from '@/lib/useSpeechSynthesis'
-import { RosaryBeads } from './RosaryBeads'
+import { RosaryProgress } from './RosaryProgress'
 
 const FONT_CLASS: Record<FontSize, string> = {
   normal: 'text-xl',
@@ -135,12 +135,7 @@ export function PrayerScreen({
         </div>
       </div>
 
-      {/* ── Rosary beads (Marian only) ── */}
-      {tipo === 'mariano' && (
-        <div className="w-full mb-4">
-          <RosaryBeads currentIndex={index} />
-        </div>
-      )}
+      <RosaryProgress misterio={misterio} tipo={tipo} currentIndex={index} />
 
       {/* ── Prayer card ── */}
       <div
