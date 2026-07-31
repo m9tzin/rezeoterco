@@ -1,8 +1,5 @@
 import type { Etapa, TercoData } from './types'
 
-const ABERTURA =
-  `Ó Sangue e Água que jorraste do Coração de Jesus como fonte de Misericórdia para nós, confio em Vós!`
-
 const PAI_NOSSO =
   `Pai nosso que estais no céu, santificado seja o vosso nome; venha a nós o vosso reino; seja feita a vossa vontade assim na terra como no céu. O pão nosso de cada dia nos dai hoje; perdoai-nos as nossas ofensas assim como nós perdoamos a quem nos tem ofendido; e não nos deixeis cair em tentação, mas livrai-nos do mal. Amém.`
 
@@ -24,16 +21,10 @@ const DEUS_SANTO =
 function gerarEtapas(): Etapa[] {
   const etapas: Etapa[] = []
 
-  for (let i = 1; i <= 3; i++) {
-    etapas.push({
-      tipo: 'misericordia-abertura',
-      label: `Oração de Abertura ${i}/3`,
-      texto: ABERTURA,
-    })
-  }
-
   etapas.push({ tipo: 'pai-nosso', label: 'Pai Nosso', texto: PAI_NOSSO })
-  etapas.push({ tipo: 'ave-maria', label: 'Ave Maria', texto: AVE_MARIA })
+  for (let i = 1; i <= 3; i++) {
+    etapas.push({ tipo: 'ave-maria', label: `Ave Maria ${i}/3`, texto: AVE_MARIA })
+  }
   etapas.push({ tipo: 'credo', label: 'Credo', texto: CREDO })
 
   for (let decada = 1; decada <= 5; decada++) {

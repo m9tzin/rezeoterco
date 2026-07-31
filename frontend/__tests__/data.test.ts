@@ -53,8 +53,8 @@ describe('Terço da Divina Misericórdia', () => {
     expect(misericordiaData.misterios).toHaveLength(1)
   })
 
-  it('the single sequence has exactly 64 etapas', () => {
-    expect(misericordiaData.misterios[0].etapas).toHaveLength(64)
+  it('the single sequence has exactly 63 etapas', () => {
+    expect(misericordiaData.misterios[0].etapas).toHaveLength(63)
   })
 
   it('each etapa has non-empty label and texto', () => {
@@ -76,5 +76,51 @@ describe('Terço da Divina Misericórdia', () => {
       (e) => e.tipo === 'misericordia-oferta'
     )
     expect(oferta).toHaveLength(5)
+  })
+
+  it('starts with Pai Nosso, 3 Ave Marias, and Credo', () => {
+    const abertura = misericordiaData.misterios[0].etapas.slice(0, 5)
+
+    expect(abertura.map((etapa) => etapa.tipo)).toEqual([
+      'pai-nosso',
+      'ave-maria',
+      'ave-maria',
+      'ave-maria',
+      'credo',
+    ])
+    expect(abertura.map((etapa) => etapa.label)).toEqual([
+      'Pai Nosso',
+      'Ave Maria 1/3',
+      'Ave Maria 2/3',
+      'Ave Maria 3/3',
+      'Credo',
+    ])
+  })
+
+  it('continues with 5 decades of oferta followed by 10 dolorosa paixao prayers', () => {
+    const dezenas = misericordiaData.misterios[0].etapas.slice(5, 60)
+
+    for (let decada = 0; decada < 5; decada++) {
+      const inicio = decada * 11
+      expect(dezenas[inicio].tipo).toBe('misericordia-oferta')
+      expect(dezenas.slice(inicio + 1, inicio + 11).map((etapa) => etapa.tipo)).toEqual(
+        Array(10).fill('misericordia-paixao')
+      )
+    }
+  })
+
+  it('ends with Deus Santo prayed 3 times', () => {
+    const final = misericordiaData.misterios[0].etapas.slice(-3)
+
+    expect(final.map((etapa) => etapa.tipo)).toEqual([
+      'misericordia-final',
+      'misericordia-final',
+      'misericordia-final',
+    ])
+    expect(final.map((etapa) => etapa.label)).toEqual([
+      'Deus Santo 1/3',
+      'Deus Santo 2/3',
+      'Deus Santo 3/3',
+    ])
   })
 })
