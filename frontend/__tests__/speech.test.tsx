@@ -7,19 +7,49 @@ type MockUtterance = {
   text: string
   lang: string
   rate: number
+  pitch: number
+  voice: SpeechSynthesisVoice | null
   onend: (() => void) | null
   onerror: (() => void) | null
 }
 
+let voicesChangedHandler: (() => void) | null = null
+
 const speechSynthesisMock = {
   speak: jest.fn(),
   cancel: jest.fn(),
+  getVoices: jest.fn<SpeechSynthesisVoice[], []>(),
+  addEventListener: jest.fn((event: string, handler: () => void) => {
+    if (event === 'voiceschanged') voicesChangedHandler = handler
+  }),
+  removeEventListener: jest.fn((event: string, handler: () => void) => {
+    if (event === 'voiceschanged' && voicesChangedHandler === handler) {
+      voicesChangedHandler = null
+    }
+  }),
+  onvoiceschanged: null as (() => void) | null,
+}
+
+function makeVoice(
+  name: string,
+  lang: string,
+  localService: boolean
+): SpeechSynthesisVoice {
+  return {
+    name,
+    lang,
+    localService,
+    default: false,
+    voiceURI: name,
+  } as SpeechSynthesisVoice
 }
 
 function installSpeechMocks() {
   class SpeechSynthesisUtteranceMock implements MockUtterance {
     lang = ''
     rate = 1
+    pitch = 1
+    voice: SpeechSynthesisVoice | null = null
     onend: (() => void) | null = null
     onerror: (() => void) | null = null
 
@@ -61,8 +91,14 @@ function renderPrayerScreen({
 
 beforeEach(() => {
   jest.useFakeTimers()
+  voicesChangedHandler = null
   speechSynthesisMock.speak.mockClear()
   speechSynthesisMock.cancel.mockClear()
+  speechSynthesisMock.getVoices.mockReset()
+  speechSynthesisMock.getVoices.mockReturnValue([])
+  speechSynthesisMock.addEventListener.mockClear()
+  speechSynthesisMock.removeEventListener.mockClear()
+  speechSynthesisMock.onvoiceschanged = null
   installSpeechMocks()
   window.HTMLElement.prototype.scrollIntoView = jest.fn()
 })
@@ -92,7 +128,8 @@ describe('speech synthesis controls', () => {
     const utterance = speechSynthesisMock.speak.mock.calls[0][0] as MockUtterance
     expect(utterance.text).toBe(marianoData.misterios[0].etapas[0].texto)
     expect(utterance.lang).toBe('pt-BR')
-    expect(utterance.rate).toBe(0.95)
+    expect(utterance.rate).toBe(0.9)
+    expect(utterance.pitch).toBe(1)
 
     expect(screen.getByRole('button', { name: 'Parar leitura contínua' })).toHaveAttribute(
       'aria-pressed',
@@ -148,7 +185,90 @@ describe('speech synthesis controls', () => {
     )
   })
 
+  it('chooses the best available pt-BR local natural voice', async () => {
+    const englishVoice = makeVoice('Alex', 'en-US', true)
+    const ptPtVoice = makeVoice('Joana', 'pt-PT', true)
+    const remotePtBrVoice = makeVoice('Google português do Brasil', 'pt-BR', false)
+    const localGenericPtBrVoice = makeVoice('Brazilian Portuguese Generic', 'pt-BR', true)
+    const localNaturalPtBrVoice = makeVoice('Luciana Natural', 'pt-BR', true)
+    speechSynthesisMock.getVoices.mockReturnValue([
+      englishVoice,
+      ptPtVoice,
+      remotePtBrVoice,
+      localGenericPtBrVoice,
+      localNaturalPtBrVoice,
+    ])
+
+    renderPrayerScreen()
+
+    const listenButton = await screen.findByRole('button', {
+      name: 'Iniciar leitura contínua',
+    })
+    await waitFor(() => expect(listenButton).not.toBeDisabled())
+    speechSynthesisMock.speak.mockClear()
+    speechSynthesisMock.cancel.mockClear()
+
+    fireEvent.click(listenButton)
+
+    const utterance = speechSynthesisMock.speak.mock.calls[0][0] as MockUtterance
+    expect(utterance.voice).toBe(localNaturalPtBrVoice)
+    expect(utterance.lang).toBe('pt-BR')
+    expect(utterance.rate).toBe(0.9)
+    expect(utterance.pitch).toBe(1)
+  })
+
+  it('loads voices from voiceschanged and falls back to another Portuguese voice', async () => {
+    const englishVoice = makeVoice('Alex', 'en-US', true)
+    const ptPtVoice = makeVoice('Joana', 'pt-PT', true)
+    speechSynthesisMock.getVoices.mockReturnValueOnce([]).mockReturnValue([englishVoice, ptPtVoice])
+
+    renderPrayerScreen()
+
+    const listenButton = await screen.findByRole('button', {
+      name: 'Iniciar leitura contínua',
+    })
+    await waitFor(() => expect(listenButton).not.toBeDisabled())
+
+    act(() => {
+      voicesChangedHandler?.()
+    })
+
+    await waitFor(() => expect(speechSynthesisMock.getVoices).toHaveBeenCalledTimes(2))
+    speechSynthesisMock.speak.mockClear()
+    speechSynthesisMock.cancel.mockClear()
+
+    fireEvent.click(listenButton)
+
+    const utterance = speechSynthesisMock.speak.mock.calls[0][0] as MockUtterance
+    expect(utterance.voice).toBe(ptPtVoice)
+    expect(utterance.lang).toBe('pt-BR')
+  })
+
+  it('uses the browser default voice when no Portuguese voice is available', async () => {
+    speechSynthesisMock.getVoices.mockReturnValue([
+      makeVoice('Alex', 'en-US', true),
+      makeVoice('Thomas', 'fr-FR', true),
+    ])
+
+    renderPrayerScreen()
+
+    const listenButton = await screen.findByRole('button', {
+      name: 'Iniciar leitura contínua',
+    })
+    await waitFor(() => expect(listenButton).not.toBeDisabled())
+    speechSynthesisMock.speak.mockClear()
+    speechSynthesisMock.cancel.mockClear()
+
+    fireEvent.click(listenButton)
+
+    const utterance = speechSynthesisMock.speak.mock.calls[0][0] as MockUtterance
+    expect(utterance.voice).toBeNull()
+    expect(utterance.lang).toBe('pt-BR')
+  })
+
   it('auto-advances and keeps reading until the final step finishes', async () => {
+    const localNaturalPtBrVoice = makeVoice('Luciana Natural', 'pt-BR', true)
+    speechSynthesisMock.getVoices.mockReturnValue([localNaturalPtBrVoice])
     const misterio: Misterio = {
       id: 'teste',
       titulo: 'Sequência curta',
@@ -174,6 +294,9 @@ describe('speech synthesis controls', () => {
     expect(speechSynthesisMock.speak).toHaveBeenCalledTimes(1)
     const firstUtterance = speechSynthesisMock.speak.mock.calls[0][0] as MockUtterance
     expect(firstUtterance.text).toBe('Texto 1')
+    expect(firstUtterance.voice).toBe(localNaturalPtBrVoice)
+    expect(firstUtterance.rate).toBe(0.9)
+    expect(firstUtterance.pitch).toBe(1)
 
     act(() => {
       firstUtterance.onend?.()
@@ -185,6 +308,7 @@ describe('speech synthesis controls', () => {
     expect(onStepChange).toHaveBeenCalledWith(1)
     const secondUtterance = speechSynthesisMock.speak.mock.calls[1][0] as MockUtterance
     expect(secondUtterance.text).toBe('Texto 2')
+    expect(secondUtterance.voice).toBe(localNaturalPtBrVoice)
 
     act(() => {
       secondUtterance.onend?.()
