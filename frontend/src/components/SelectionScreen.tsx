@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import type { TipoTerco, Progress } from '@/data/types'
 import { TERCOS, TERCO_LIST } from '@/data/index'
+import { VerseOfDay } from './VerseOfDay'
 
 type Props = {
   savedProgress: Progress | null
@@ -109,6 +110,8 @@ export function SelectionScreen({
           <div className="h-px flex-1 bg-parchment" />
         </div>
       </div>
+
+      <VerseOfDay />
 
       {/* Resume banner */}
       {savedProgress && (
