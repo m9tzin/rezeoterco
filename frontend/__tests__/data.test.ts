@@ -1,5 +1,6 @@
 import { marianoData } from '@/data/mariano'
 import { TERCO_LIST, TERCOS } from '@/data/index'
+import { novenaData } from '@/data/novenas'
 
 describe('Terço Mariano', () => {
   it('has exactly 4 mysteries', () => {
@@ -128,12 +129,13 @@ describe('Terço da Divina Misericórdia', () => {
 })
 
 describe('Tipos de terço disponíveis', () => {
-  it('lists all supported rosary types for selection', () => {
+  it('lists all supported devotional types for selection', () => {
     expect(TERCO_LIST.map((terco) => terco.id)).toEqual([
       'mariano',
       'misericordia',
       'libertacao',
       'santas-chagas',
+      'novena',
     ])
   })
 
@@ -178,5 +180,36 @@ describe('Terços devocionais', () => {
       'oracao-final',
       'oracao-final',
     ])
+  })
+})
+
+describe('Novenas', () => {
+  it('is available as a devotional type for selection', () => {
+    expect(TERCO_LIST.map((terco) => terco.id)).toContain('novena')
+    expect(TERCOS.novena).toBe(novenaData)
+  })
+
+  it('includes the requested novenas', () => {
+    expect(novenaData.misterios.map((novena) => novena.id)).toEqual([
+      'santa-terezinha',
+      'santo-antonio',
+      'nossa-senhora-das-gracas',
+    ])
+    expect(novenaData.misterios.map((novena) => novena.titulo)).toEqual([
+      'Novena de Santa Terezinha',
+      'Novena de Santo Antônio',
+      'Novena de Nossa Senhora das Graças',
+    ])
+  })
+
+  it('each novena has 9 non-empty day steps', () => {
+    novenaData.misterios.forEach((novena) => {
+      expect(novena.etapas).toHaveLength(9)
+      expect(novena.etapas.map((etapa) => etapa.tipo)).toEqual(Array(9).fill('novena-dia'))
+      novena.etapas.forEach((etapa, index) => {
+        expect(etapa.label).toContain(`Dia ${index + 1}/9`)
+        expect(etapa.texto.length).toBeGreaterThan(0)
+      })
+    })
   })
 })

@@ -1,6 +1,7 @@
 import type { TercoData, TipoTerco } from './types'
 import { marianoData } from './mariano'
 import { misericordiaData } from './misericordia'
+import { novenaData } from './novenas'
 import { libertacaoData, santasChagasData } from './devocionais'
 
 export const TERCOS: Record<TipoTerco, TercoData> = {
@@ -8,6 +9,7 @@ export const TERCOS: Record<TipoTerco, TercoData> = {
   misericordia: misericordiaData,
   libertacao: libertacaoData,
   'santas-chagas': santasChagasData,
+  novena: novenaData,
 }
 
 export const TERCO_LIST: TercoData[] = [
@@ -15,4 +17,5 @@ export const TERCO_LIST: TercoData[] = [
   misericordiaData,
   libertacaoData,
   santasChagasData,
+  novenaData,
 ]

@@ -38,6 +38,31 @@ describe('Home prayer flow', () => {
     expect(screen.queryByText('Credo')).not.toBeInTheDocument()
   })
 
+  it('shows and starts the requested novenas from the selection screen', async () => {
+    render(<Home />)
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Novenas' }))
+
+    expect(screen.getByText('Escolha a novena')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Novena de Santa Terezinha' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Novena de Santo Antônio' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Novena de Nossa Senhora das Graças' })
+    ).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Novena de Santo Antônio' }))
+
+    expect(screen.getByText('Novena de Santo Antônio')).toBeInTheDocument()
+    expect(screen.getByText('Dia 1/9 — Fé')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Próxima etapa' }))
+    act(() => {
+      jest.advanceTimersByTime(150)
+    })
+
+    expect(await screen.findByText('Dia 2/9 — Palavra de Deus')).toBeInTheDocument()
+  })
+
   it('starts the new devotional rosary types from the selection screen', async () => {
     render(<Home />)
 

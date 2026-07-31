@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import type { TipoTerco, Progress } from '@/data/types'
 import { TERCOS, TERCO_LIST } from '@/data/index'
 
@@ -47,6 +47,24 @@ const MISTERIO_VISUAL: Record<
     dias: 'Quarta · Domingo',
     cor: '#c9a85c',
   },
+  'santa-terezinha': {
+    simbolo: 'ST',
+    tema: 'Confiança · Pequeno caminho',
+    dias: '9 dias',
+    cor: '#b46a7c',
+  },
+  'santo-antonio': {
+    simbolo: 'SA',
+    tema: 'Caridade · Evangelho',
+    dias: '9 dias',
+    cor: '#7d6b4f',
+  },
+  'nossa-senhora-das-gracas': {
+    simbolo: 'NS',
+    tema: 'Graças · Intercessão',
+    dias: '9 dias',
+    cor: '#4d7ca8',
+  },
 }
 
 function getTodayMisterioId(): string {
@@ -68,9 +86,14 @@ export function SelectionScreen({
   onResume,
   onDismissProgress,
 }: Props) {
-  const activeTipo: TipoTerco = savedProgress?.tipo ?? 'mariano'
+  const [activeTipo, setActiveTipo] = useState<TipoTerco>(savedProgress?.tipo ?? 'mariano')
   const activeTerco = TERCOS[activeTipo]
   const todayId = getTodayMisterioId()
+  const hasMultipleOptions = activeTerco.misterios.length > 1
+
+  useEffect(() => {
+    if (savedProgress) setActiveTipo(savedProgress.tipo)
+  }, [savedProgress])
 
   return (
     <div className="bg-cream flex flex-col items-center px-4 pb-8">
@@ -142,15 +165,19 @@ export function SelectionScreen({
       {/* Terço type selector */}
       <div className="w-full max-w-lg mb-7">
         <p className="font-cormorant font-semibold text-base text-terco-muted/80 mb-3 tracking-wide">
-          Tipo de terço
+          Tipo de devoção
         </p>
         <div className="flex gap-2 flex-wrap">
           {TERCO_LIST.map((terco) => (
             <button
               key={terco.id}
               onClick={() => {
-                const firstMisterio = TERCOS[terco.id].misterios[0]
-                onSelectMisterio(terco.id, firstMisterio.id)
+                if (TERCOS[terco.id].misterios.length === 1) {
+                  const firstMisterio = TERCOS[terco.id].misterios[0]
+                  onSelectMisterio(terco.id, firstMisterio.id)
+                  return
+                }
+                setActiveTipo(terco.id)
               }}
               className={`font-cormorant px-5 min-h-[44px] rounded-sm text-base border transition-colors active:scale-[0.97] ${
                 activeTipo === terco.id
@@ -164,29 +191,31 @@ export function SelectionScreen({
         </div>
       </div>
 
-      {/* Mystery cards */}
-      {activeTipo === 'mariano' && (
+      {/* Option cards */}
+      {hasMultipleOptions && (
         <div className="w-full max-w-lg">
           <div className="flex items-baseline justify-between mb-4">
             <p className="font-cormorant font-semibold text-lg text-terco-muted">
-              Escolha o mistério
+              {activeTipo === 'novena' ? 'Escolha a novena' : 'Escolha o mistério'}
             </p>
-            <p className="font-cormorant text-sm text-terco-muted">
-              Hoje:{' '}
-              <span className="text-brown italic">
-                {activeTerco.misterios.find((m) => m.id === todayId)?.titulo ?? '—'}
-              </span>
-            </p>
+            {activeTipo === 'mariano' && (
+              <p className="font-cormorant text-sm text-terco-muted">
+                Hoje:{' '}
+                <span className="text-brown italic">
+                  {activeTerco.misterios.find((m) => m.id === todayId)?.titulo ?? '—'}
+                </span>
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-3">
             {activeTerco.misterios.map((misterio) => {
               const vis = MISTERIO_VISUAL[misterio.id]
-              const isToday = misterio.id === todayId
+              const isToday = activeTipo === 'mariano' && misterio.id === todayId
               return (
                 <button
                   key={misterio.id}
-                  onClick={() => onSelectMisterio('mariano', misterio.id)}
+                  onClick={() => onSelectMisterio(activeTipo, misterio.id)}
                   className={`w-full text-left flex items-center gap-4 px-5 py-4 border bg-white hover:bg-[#faf8f3] transition-all duration-200 rounded-sm active:scale-[0.99] group shadow-[0_1px_4px_rgba(92,61,46,0.05)] hover:shadow-[0_3px_12px_rgba(92,61,46,0.1)] ${
                     isToday ? 'border-[1.5px]' : 'border-parchment'
                   }`}
@@ -254,8 +283,8 @@ export function SelectionScreen({
         </div>
       )}
 
-      {/* Non-Mariano: single CTA */}
-      {activeTipo !== 'mariano' && (
+      {/* Single-sequence CTA */}
+      {!hasMultipleOptions && (
         <div className="w-full max-w-lg mt-2">
           <button
             onClick={() => {

@@ -56,6 +56,18 @@ describe('progress storage', () => {
     expect(loadProgress()).toEqual(updated)
   })
 
+  it('loads progress for novenas', () => {
+    const updated: Progress = {
+      tipo: 'novena',
+      misterioId: 'santo-antonio',
+      etapaIndex: 4,
+    }
+
+    saveProgress(updated)
+
+    expect(loadProgress()).toEqual(updated)
+  })
+
   it('loads progress for devotional rosary types', () => {
     const updated: Progress = {
       tipo: 'santas-chagas',
