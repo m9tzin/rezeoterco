@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import type { Misterio, FontSize, TipoTerco } from '@/data/types'
 import { canGoNext, canGoPrev, nextIndex, prevIndex } from '@/lib/navigation'
+import { useSpeechSynthesis } from '@/lib/useSpeechSynthesis'
 import { RosaryBeads } from './RosaryBeads'
 
 const FONT_CLASS: Record<FontSize, string> = {
@@ -40,6 +41,7 @@ export function PrayerScreen({
 
   const etapa = misterio.etapas[index]
   const total = misterio.etapas.length
+  const speech = useSpeechSynthesis(etapa.texto)
 
   const go = useCallback(
     (newIndex: number) => {
@@ -54,13 +56,15 @@ export function PrayerScreen({
   )
 
   const handleNext = useCallback(() => {
+    speech.stop()
     if (canGoNext(index, total)) go(nextIndex(index))
     else onComplete()
-  }, [index, total, go, onComplete])
+  }, [index, total, go, onComplete, speech])
 
   const handlePrev = useCallback(() => {
+    speech.stop()
     if (canGoPrev(index)) go(prevIndex(index))
-  }, [index, go])
+  }, [index, go, speech])
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -141,12 +145,23 @@ export function PrayerScreen({
       {/* ── Prayer card ── */}
       <div
         ref={cardRef}
-        className={`w-full max-w-[560px] bg-white border border-parchment rounded-sm shadow-[0_2px_20px_rgba(92,61,46,0.09)] px-7 py-7 mb-5 transition-opacity duration-150 ${
+        data-speaking={speech.isSpeaking}
+        className={`w-full max-w-[560px] bg-white border rounded-sm px-7 py-7 mb-5 transition-all duration-150 ${
+          speech.isSpeaking
+            ? 'border-gold shadow-[0_0_0_3px_rgba(154,123,63,0.16),0_2px_20px_rgba(92,61,46,0.12)]'
+            : 'border-parchment shadow-[0_2px_20px_rgba(92,61,46,0.09)]'
+        } ${
           visible ? 'opacity-100' : 'opacity-0'
         }`}
       >
         {/* Step label */}
-        <p className="font-cormorant italic text-sm text-gold tracking-wide mb-3 uppercase">
+        <p className="font-cormorant italic text-sm text-gold tracking-wide mb-3 uppercase flex items-center gap-2">
+          {speech.isSpeaking && (
+            <span
+              className="inline-block h-2 w-2 rounded-full bg-gold"
+              aria-hidden="true"
+            />
+          )}
           {etapa.label}
         </p>
 
@@ -167,6 +182,19 @@ export function PrayerScreen({
           Tamanho da fonte
         </span>
         <div className="flex gap-1.5 ml-auto">
+          <button
+            onClick={speech.toggle}
+            disabled={!speech.isSupported}
+            aria-pressed={speech.isSpeaking}
+            aria-label={speech.isSpeaking ? 'Parar leitura em voz alta' : 'Ler oração em voz alta'}
+            className={`min-h-[44px] px-4 flex items-center justify-center border font-cormorant text-base transition-colors rounded-sm disabled:opacity-30 ${
+              speech.isSpeaking
+                ? 'border-gold bg-gold text-cream'
+                : 'border-parchment bg-white text-terco-muted hover:border-gold hover:text-brown'
+            }`}
+          >
+            {speech.isSpeaking ? 'Parar' : 'Ouvir'}
+          </button>
           <button
             onClick={() => fontIndex > 0 && onFontChange(SIZES[fontIndex - 1])}
             disabled={fontIndex === 0}
