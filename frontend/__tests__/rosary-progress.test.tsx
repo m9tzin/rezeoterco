@@ -116,6 +116,17 @@ describe('RosaryProgress', () => {
     )
   })
 
+  it('caps the rosary figure against the viewport height so it cannot push the prayer card under the fixed navigation', () => {
+    const misterio = marianoData.misterios[0]
+    render(<RosaryProgress misterio={misterio} tipo="mariano" currentIndex={0} layout="terco" />)
+
+    const width = screen.getByTestId('progress-terco-layout').getAttribute('style') ?? ''
+
+    // A plain px width would let a tall devotional grow past the fold on short
+    // phones; the viewport-relative term is what keeps the figure in budget.
+    expect(width).toMatch(/width:\s*min\(228px,\s*[\d.]+vh\)/)
+  })
+
   it('renders the physical rosary layout for every registered devotional type', () => {
     const firstTerco = TERCO_LIST[0]
     const firstMisterio = firstTerco.misterios[0]

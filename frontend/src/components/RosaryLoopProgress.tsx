@@ -10,21 +10,36 @@ type Props = {
   currentIndex: number
 }
 
+/** Width the figure settles at once the viewport is tall enough for it. */
+const MAX_FIGURE_WIDTH = 228
+/**
+ * Share of the viewport height the rosary may claim. The navigation bar is
+ * pinned to the bottom of the viewport, so a figure taller than this pushes the
+ * prayer card underneath it before the reader has scrolled at all.
+ */
+const MAX_VIEWPORT_SHARE = 30
+
 export function RosaryLoopProgress({ misterio, tipo, currentIndex }: Props) {
   const currentEtapa = misterio.etapas[currentIndex]
   const progress = Math.round(((currentIndex + 1) / misterio.etapas.length) * 100)
   const tones = misterio.etapas.map(beadTone)
   const layout = buildRosaryLayout(tones)
   const { cross } = layout
+  // The figure is taller than it is wide, so height is the scarce dimension.
+  // Driving width off the height budget keeps the proportions exact.
+  const widthAtHeightCap = (MAX_VIEWPORT_SHARE * VIEW_WIDTH) / layout.viewHeight
 
   return (
     <section
-      className="w-full max-w-[560px] md:max-w-2xl lg:max-w-3xl mb-5"
+      className="w-full max-w-[560px] md:max-w-2xl lg:max-w-3xl mb-3"
       aria-label={`Figura do progresso em formato de terço: ${describeTipo(tipo)}`}
     >
       <div
-        className="relative mx-auto w-full max-w-[228px]"
-        style={{ aspectRatio: `${VIEW_WIDTH} / ${layout.viewHeight}` }}
+        className="relative mx-auto max-w-full"
+        style={{
+          aspectRatio: `${VIEW_WIDTH} / ${layout.viewHeight}`,
+          width: `min(${MAX_FIGURE_WIDTH}px, ${widthAtHeightCap.toFixed(2)}vh)`,
+        }}
         role="list"
         data-testid="progress-terco-layout"
       >
@@ -85,7 +100,7 @@ export function RosaryLoopProgress({ misterio, tipo, currentIndex }: Props) {
         })}
       </div>
 
-      <p className="font-cormorant text-sm text-terco-muted text-center mt-2">
+      <p className="font-cormorant text-sm text-terco-muted text-center mt-1">
         {currentEtapa?.label ?? 'Etapa atual'} · {progress}%
       </p>
     </section>
