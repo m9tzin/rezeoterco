@@ -34,4 +34,14 @@ describe('WelcomeScreen', () => {
 
     expect(onStart).toHaveBeenCalledTimes(1)
   })
+
+  it('uses a clear menu shortcut for skipping the welcome content', () => {
+    const onStart = jest.fn()
+
+    render(<WelcomeScreen hasSavedProgress={false} onStart={onStart} onResume={jest.fn()} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Menu' }))
+
+    expect(onStart).toHaveBeenCalledTimes(1)
+  })
 })

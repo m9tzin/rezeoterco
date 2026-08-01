@@ -32,7 +32,7 @@ export function WelcomeScreen({
             onClick={onStart}
             className="font-cormorant text-base text-terco-muted hover:text-brown transition-colors min-h-[44px] px-3"
           >
-            Pular
+            Menu
           </button>
         </div>
 
@@ -96,14 +96,21 @@ export function WelcomeScreen({
           ].map(([number, title, text]) => (
             <div
               key={number}
-              className="border border-parchment bg-white rounded-sm px-5 py-5 shadow-[0_1px_8px_rgba(92,61,46,0.06)]"
+              className="relative overflow-hidden border border-parchment bg-white rounded-sm px-5 py-5 shadow-[0_1px_8px_rgba(92,61,46,0.06)]"
             >
-              <span className="font-cormorant text-gold text-sm tracking-[0.2em]">
-                PASSO {number}
-              </span>
-              <h3 className="font-cormorant font-semibold text-brown text-xl mt-2 mb-2">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gold/50" aria-hidden="true" />
+              <div className="mb-4 flex items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gold/50 bg-parchment/70 font-cormorant font-semibold text-brown text-lg">
+                  {number}
+                </span>
+                <span className="font-cormorant text-gold text-sm tracking-[0.2em]">
+                  PASSO
+                </span>
+              </div>
+              <h3 className="font-cormorant font-semibold text-brown text-2xl leading-snug mb-2">
                 {title}
               </h3>
+              <div className="w-8 h-px bg-gold/30 mb-3" aria-hidden="true" />
               <p className="font-garamond text-terco-muted text-base leading-relaxed">{text}</p>
             </div>
           ))}
