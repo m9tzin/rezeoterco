@@ -4,14 +4,15 @@ import { useState, useEffect } from 'react'
 import type { TipoTerco, FontSize, Progress, ProgressLayout } from '@/data/types'
 import { TERCOS } from '@/data/index'
 import { saveProgress, loadProgress, clearProgress, savePreferences, loadPreferences } from '@/lib/storage'
+import { WelcomeScreen } from '@/components/WelcomeScreen'
 import { SelectionScreen } from '@/components/SelectionScreen'
 import { PrayerScreen } from '@/components/PrayerScreen'
 import { CompletionScreen } from '@/components/CompletionScreen'
 
-type View = 'selection' | 'praying' | 'complete'
+type View = 'welcome' | 'selection' | 'praying' | 'complete'
 
 export default function Home() {
-  const [view, setView] = useState<View>('selection')
+  const [view, setView] = useState<View>('welcome')
   const [tipo, setTipo] = useState<TipoTerco>('mariano')
   const [misterioId, setMisterioId] = useState<string>('gozosos')
   const [etapaIndex, setEtapaIndex] = useState(0)
@@ -51,6 +52,10 @@ export default function Home() {
   function handleDismissProgress() {
     clearProgress()
     setSavedProgress(null)
+  }
+
+  function handleStartSelection() {
+    setView('selection')
   }
 
   function handleStepChange(index: number) {
@@ -93,6 +98,13 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1">
+        {view === 'welcome' && (
+          <WelcomeScreen
+            hasSavedProgress={Boolean(savedProgress)}
+            onStart={handleStartSelection}
+            onResume={handleResume}
+          />
+        )}
         {view === 'selection' && (
           <SelectionScreen
             savedProgress={savedProgress}
@@ -101,6 +113,7 @@ export default function Home() {
             onResume={handleResume}
             onDismissProgress={handleDismissProgress}
             onProgressLayoutChange={handleProgressLayoutChange}
+            onShowWelcome={() => setView('welcome')}
           />
         )}
         {view === 'praying' && misterio && (

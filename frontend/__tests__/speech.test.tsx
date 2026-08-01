@@ -82,6 +82,7 @@ function renderPrayerScreen({
       tipo="mariano"
       initialIndex={0}
       fontSize="normal"
+      progressLayout="linear"
       onFontChange={jest.fn()}
       onComplete={onComplete}
       onStepChange={onStepChange}

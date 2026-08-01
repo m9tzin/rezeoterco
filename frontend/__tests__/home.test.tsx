@@ -13,11 +13,52 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 
+async function goToSelection() {
+  fireEvent.click(await screen.findByRole('button', { name: 'Vamos rezar o terço?' }))
+  expect(await screen.findByText('Versículo do dia')).toBeInTheDocument()
+}
+
 describe('Home prayer flow', () => {
+  it('shows the welcome screen before selection and navigates to devotional choices', async () => {
+    render(<Home />)
+
+    expect(await screen.findByText('Como rezar em poucos passos')).toBeInTheDocument()
+    expect(screen.getByText('Vídeo demonstrativo em breve')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Vamos rezar o terço?' }))
+
+    expect(await screen.findByText('Versículo do dia')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Como rezar' })).toBeInTheDocument()
+  })
+
+  it('reopens the welcome screen from the selection screen', async () => {
+    render(<Home />)
+
+    await goToSelection()
+    fireEvent.click(screen.getByRole('button', { name: 'Como rezar' }))
+
+    expect(screen.getByText('Como rezar em poucos passos')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Vamos rezar o terço?' })).toBeInTheDocument()
+  })
+
+  it('lets returning users continue saved progress from the welcome screen', async () => {
+    localStorage.setItem(
+      'terco-progress',
+      JSON.stringify({ tipo: 'mariano', misterioId: 'gozosos', etapaIndex: 1 })
+    )
+
+    render(<Home />)
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Continuar oração salva' }))
+
+    expect(screen.getByText('Pai Nosso')).toBeInTheDocument()
+    expect(screen.getByText('Mistérios Gozosos')).toBeInTheDocument()
+  })
+
   it('preserves current progress when returning to the selection screen', async () => {
     render(<Home />)
 
-    expect(await screen.findByText('Versículo do dia')).toBeInTheDocument()
+    await goToSelection()
 
     fireEvent.click(await screen.findByRole('button', { name: /Mistérios Gozosos/ }))
     expect(screen.getByText('Credo')).toBeInTheDocument()
@@ -43,7 +84,7 @@ describe('Home prayer flow', () => {
   it('returns to the selection screen from the lower back button on the first step', async () => {
     render(<Home />)
 
-    expect(await screen.findByText('Versículo do dia')).toBeInTheDocument()
+    await goToSelection()
 
     fireEvent.click(await screen.findByRole('button', { name: /Mistérios Gozosos/ }))
     expect(screen.getByText('Credo')).toBeInTheDocument()
@@ -65,7 +106,7 @@ describe('Home prayer flow', () => {
   it('keeps the lower back button moving to the previous step after the first step', async () => {
     render(<Home />)
 
-    expect(await screen.findByText('Versículo do dia')).toBeInTheDocument()
+    await goToSelection()
 
     fireEvent.click(await screen.findByRole('button', { name: /Mistérios Gozosos/ }))
     expect(screen.getByText('Credo')).toBeInTheDocument()
@@ -89,6 +130,7 @@ describe('Home prayer flow', () => {
   it('shows and starts the requested novenas from the selection screen', async () => {
     render(<Home />)
 
+    await goToSelection()
     fireEvent.click(await screen.findByRole('button', { name: 'Novenas' }))
 
     expect(screen.getByText('Escolha a novena')).toBeInTheDocument()
@@ -135,6 +177,7 @@ describe('Home prayer flow', () => {
   it('starts the new devotional rosary types from the selection screen', async () => {
     render(<Home />)
 
+    await goToSelection()
     fireEvent.click(await screen.findByRole('button', { name: 'Terço da Libertação' }))
 
     expect(screen.getByText('Terço da Libertação')).toBeInTheDocument()
@@ -157,7 +200,7 @@ describe('Home prayer flow', () => {
   it('persists and uses the selected progress layout', async () => {
     render(<Home />)
 
-    expect(await screen.findByText('Versículo do dia')).toBeInTheDocument()
+    await goToSelection()
     expect(screen.getByRole('button', { name: 'Pedras' })).toHaveAttribute(
       'aria-pressed',
       'true'

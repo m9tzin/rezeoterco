@@ -12,6 +12,7 @@ type Props = {
   onResume: () => void
   onDismissProgress: () => void
   onProgressLayoutChange: (layout: ProgressLayout) => void
+  onShowWelcome: () => void
 }
 
 const CruzSVG = (
@@ -90,6 +91,7 @@ export function SelectionScreen({
   onResume,
   onDismissProgress,
   onProgressLayoutChange,
+  onShowWelcome,
 }: Props) {
   const [activeTipo, setActiveTipo] = useState<TipoTerco>(savedProgress?.tipo ?? 'mariano')
   const activeTerco = TERCOS[activeTipo]
@@ -104,6 +106,16 @@ export function SelectionScreen({
     <div className="bg-cream flex flex-col items-center px-4 pb-8">
       {/* Hero */}
       <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl text-center pt-14 pb-8">
+        <div className="flex justify-end mb-3">
+          <button
+            type="button"
+            onClick={onShowWelcome}
+            className="font-cormorant text-base text-terco-muted hover:text-brown transition-colors min-h-[44px] px-3"
+          >
+            Como rezar
+          </button>
+        </div>
+
         <svg
           width="26"
           height="42"

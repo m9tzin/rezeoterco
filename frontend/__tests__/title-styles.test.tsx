@@ -17,9 +17,12 @@ describe('title typography', () => {
     render(
       <SelectionScreen
         savedProgress={null}
+        progressLayout="linear"
         onSelectMisterio={jest.fn()}
         onResume={jest.fn()}
         onDismissProgress={jest.fn()}
+        onProgressLayoutChange={jest.fn()}
+        onShowWelcome={jest.fn()}
       />
     )
 
@@ -42,6 +45,7 @@ describe('title typography', () => {
         tipo="mariano"
         initialIndex={0}
         fontSize="normal"
+        progressLayout="linear"
         onFontChange={jest.fn()}
         onComplete={jest.fn()}
         onStepChange={jest.fn()}
