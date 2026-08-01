@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import type { Misterio, FontSize, TipoTerco } from '@/data/types'
+import type { Misterio, FontSize, ProgressLayout, TipoTerco } from '@/data/types'
 import { canGoNext, canGoPrev, nextIndex, prevIndex } from '@/lib/navigation'
 import { useSpeechSynthesis } from '@/lib/useSpeechSynthesis'
 import { RosaryProgress } from './RosaryProgress'
@@ -19,7 +19,9 @@ type Props = {
   tipo: TipoTerco
   initialIndex: number
   fontSize: FontSize
+  progressLayout: ProgressLayout
   onFontChange: (size: FontSize) => void
+  onProgressLayoutChange: (layout: ProgressLayout) => void
   onComplete: () => void
   onStepChange: (index: number) => void
   onBack: () => void
@@ -30,7 +32,9 @@ export function PrayerScreen({
   tipo,
   initialIndex,
   fontSize,
+  progressLayout,
   onFontChange,
+  onProgressLayoutChange,
   onComplete,
   onStepChange,
   onBack,
@@ -200,7 +204,38 @@ export function PrayerScreen({
         </div>
       </div>
 
-      <RosaryProgress misterio={misterio} tipo={tipo} currentIndex={index} />
+      <RosaryProgress
+        misterio={misterio}
+        tipo={tipo}
+        currentIndex={index}
+        layout={progressLayout}
+      />
+
+      <div className="flex items-center gap-3 w-full max-w-[560px] md:max-w-2xl lg:max-w-3xl mb-4">
+        <span className="font-cormorant text-sm text-terco-muted/70 tracking-wide">
+          Formato do progresso
+        </span>
+        <div className="ml-auto inline-flex rounded-sm border border-parchment bg-white p-1">
+          {([
+            ['linear', 'Pedras'],
+            ['terco', 'Terço'],
+          ] as const).map(([layout, label]) => (
+            <button
+              key={layout}
+              type="button"
+              onClick={() => onProgressLayoutChange(layout)}
+              aria-pressed={progressLayout === layout}
+              className={`min-h-[36px] px-3 rounded-sm font-cormorant text-base transition-colors ${
+                progressLayout === layout
+                  ? 'bg-brown text-cream shadow-[0_1px_4px_rgba(92,61,46,0.16)]'
+                  : 'text-terco-muted hover:text-brown'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* ── Prayer card ── */}
       <div
@@ -277,7 +312,7 @@ export function PrayerScreen({
       </div>
 
       {/* ── Navigation (fixed) ── */}
-      <div className="fixed bottom-12 left-0 right-0 px-4">
+      <div className="fixed bottom-4 left-0 right-0 px-4">
         <div className="flex justify-center gap-2 max-w-[560px] md:max-w-2xl lg:max-w-3xl mx-auto">
           <button
             onClick={handlePrev}

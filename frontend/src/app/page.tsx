@@ -1,21 +1,23 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { TipoTerco, FontSize, Progress } from '@/data/types'
+import type { TipoTerco, FontSize, Progress, ProgressLayout } from '@/data/types'
 import { TERCOS } from '@/data/index'
 import { saveProgress, loadProgress, clearProgress, savePreferences, loadPreferences } from '@/lib/storage'
+import { WelcomeScreen } from '@/components/WelcomeScreen'
 import { SelectionScreen } from '@/components/SelectionScreen'
 import { PrayerScreen } from '@/components/PrayerScreen'
 import { CompletionScreen } from '@/components/CompletionScreen'
 
-type View = 'selection' | 'praying' | 'complete'
+type View = 'welcome' | 'selection' | 'praying' | 'complete'
 
 export default function Home() {
-  const [view, setView] = useState<View>('selection')
+  const [view, setView] = useState<View>('welcome')
   const [tipo, setTipo] = useState<TipoTerco>('mariano')
   const [misterioId, setMisterioId] = useState<string>('gozosos')
   const [etapaIndex, setEtapaIndex] = useState(0)
   const [fontSize, setFontSize] = useState<FontSize>('normal')
+  const [progressLayout, setProgressLayout] = useState<ProgressLayout>('linear')
   const [savedProgress, setSavedProgress] = useState<Progress | null>(null)
   const [hydrated, setHydrated] = useState(false)
 
@@ -24,6 +26,7 @@ export default function Home() {
     const prefs = loadPreferences()
     setSavedProgress(progress)
     setFontSize(prefs.fontSize)
+    setProgressLayout(prefs.progressLayout)
     setHydrated(true)
   }, [])
 
@@ -51,6 +54,10 @@ export default function Home() {
     setSavedProgress(null)
   }
 
+  function handleStartSelection() {
+    setView('selection')
+  }
+
   function handleStepChange(index: number) {
     setEtapaIndex(index)
     saveProgress({ tipo, misterioId, etapaIndex: index })
@@ -76,7 +83,12 @@ export default function Home() {
 
   function handleFontChange(size: FontSize) {
     setFontSize(size)
-    savePreferences({ fontSize: size })
+    savePreferences({ fontSize: size, progressLayout })
+  }
+
+  function handleProgressLayoutChange(layout: ProgressLayout) {
+    setProgressLayout(layout)
+    savePreferences({ fontSize, progressLayout: layout })
   }
 
   if (!hydrated) return null
@@ -86,12 +98,22 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1">
+        {view === 'welcome' && (
+          <WelcomeScreen
+            hasSavedProgress={Boolean(savedProgress)}
+            onStart={handleStartSelection}
+            onResume={handleResume}
+          />
+        )}
         {view === 'selection' && (
           <SelectionScreen
             savedProgress={savedProgress}
+            progressLayout={progressLayout}
             onSelectMisterio={handleSelectMisterio}
             onResume={handleResume}
             onDismissProgress={handleDismissProgress}
+            onProgressLayoutChange={handleProgressLayoutChange}
+            onShowWelcome={() => setView('welcome')}
           />
         )}
         {view === 'praying' && misterio && (
@@ -100,7 +122,9 @@ export default function Home() {
             tipo={tipo}
             initialIndex={etapaIndex}
             fontSize={fontSize}
+            progressLayout={progressLayout}
             onFontChange={handleFontChange}
+            onProgressLayoutChange={handleProgressLayoutChange}
             onComplete={handleComplete}
             onStepChange={handleStepChange}
             onBack={handleBack}

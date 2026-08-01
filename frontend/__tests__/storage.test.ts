@@ -13,7 +13,7 @@ const mockProgress: Progress = {
   etapaIndex: 5,
 }
 
-const mockPrefs: Preferences = { fontSize: 'grande' }
+const mockPrefs: Preferences = { fontSize: 'grande', progressLayout: 'terco' }
 
 beforeEach(() => {
   localStorage.clear()
@@ -88,12 +88,27 @@ describe('preferences storage', () => {
   })
 
   it('returns default preferences when nothing saved', () => {
-    expect(loadPreferences()).toEqual({ fontSize: 'normal' })
+    expect(loadPreferences()).toEqual({ fontSize: 'normal', progressLayout: 'linear' })
   })
 
   it('returns default preferences when saved preferences are invalid', () => {
     localStorage.setItem('terco-preferences', JSON.stringify({ fontSize: 'gigante' }))
 
-    expect(loadPreferences()).toEqual({ fontSize: 'normal' })
+    expect(loadPreferences()).toEqual({ fontSize: 'normal', progressLayout: 'linear' })
+  })
+
+  it('adds the default progress layout to older saved preferences', () => {
+    localStorage.setItem('terco-preferences', JSON.stringify({ fontSize: 'grande' }))
+
+    expect(loadPreferences()).toEqual({ fontSize: 'grande', progressLayout: 'linear' })
+  })
+
+  it('returns default preferences when saved progress layout is invalid', () => {
+    localStorage.setItem(
+      'terco-preferences',
+      JSON.stringify({ fontSize: 'grande', progressLayout: 'grade' })
+    )
+
+    expect(loadPreferences()).toEqual({ fontSize: 'normal', progressLayout: 'linear' })
   })
 })

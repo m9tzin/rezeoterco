@@ -50,6 +50,9 @@ export type Progress = {
 
 export type FontSize = 'normal' | 'grande' | 'muito-grande'
 
+export type ProgressLayout = 'linear' | 'terco'
+
 export type Preferences = {
   fontSize: FontSize
+  progressLayout: ProgressLayout
 }

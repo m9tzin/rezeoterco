@@ -3,7 +3,7 @@ import type { Progress, Preferences } from '@/data/types'
 const PROGRESS_KEY = 'terco-progress'
 const PREFS_KEY = 'terco-preferences'
 
-const DEFAULT_PREFERENCES: Preferences = { fontSize: 'normal' }
+const DEFAULT_PREFERENCES: Preferences = { fontSize: 'normal', progressLayout: 'linear' }
 const TERCO_IDS = new Set([
   'mariano',
   'misericordia',
@@ -12,6 +12,7 @@ const TERCO_IDS = new Set([
   'novena',
 ])
 const FONT_SIZES = new Set(['normal', 'grande', 'muito-grande'])
+const PROGRESS_LAYOUTS = new Set(['linear', 'terco'])
 
 function isProgress(value: unknown): value is Progress {
   if (!value || typeof value !== 'object') return false
@@ -32,7 +33,25 @@ function isPreferences(value: unknown): value is Preferences {
   if (!value || typeof value !== 'object') return false
 
   const prefs = value as Record<string, unknown>
-  return typeof prefs.fontSize === 'string' && FONT_SIZES.has(prefs.fontSize)
+  return (
+    typeof prefs.fontSize === 'string' &&
+    FONT_SIZES.has(prefs.fontSize) &&
+    (prefs.progressLayout === undefined ||
+      (typeof prefs.progressLayout === 'string' && PROGRESS_LAYOUTS.has(prefs.progressLayout)))
+  )
+}
+
+function normalizePreferences(value: Record<string, unknown>): Preferences {
+  return {
+    fontSize:
+      typeof value.fontSize === 'string' && FONT_SIZES.has(value.fontSize)
+        ? (value.fontSize as Preferences['fontSize'])
+        : DEFAULT_PREFERENCES.fontSize,
+    progressLayout:
+      typeof value.progressLayout === 'string' && PROGRESS_LAYOUTS.has(value.progressLayout)
+        ? (value.progressLayout as Preferences['progressLayout'])
+        : DEFAULT_PREFERENCES.progressLayout,
+  }
 }
 
 export function saveProgress(progress: Progress): void {
@@ -63,7 +82,9 @@ export function loadPreferences(): Preferences {
   if (!raw) return DEFAULT_PREFERENCES
   try {
     const prefs = JSON.parse(raw)
-    return isPreferences(prefs) ? prefs : DEFAULT_PREFERENCES
+    return isPreferences(prefs)
+      ? normalizePreferences(prefs as Record<string, unknown>)
+      : DEFAULT_PREFERENCES
   } catch {
     return DEFAULT_PREFERENCES
   }
