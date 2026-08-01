@@ -17,14 +17,16 @@ const MAX_FIGURE_WIDTH = 228
  * pinned to the bottom of the viewport, so a figure taller than this pushes the
  * prayer card underneath it before the reader has scrolled at all.
  */
-const MAX_VIEWPORT_SHARE = 30
+const MAX_VIEWPORT_SHARE = 31
 
 export function RosaryLoopProgress({ misterio, tipo, currentIndex }: Props) {
   const currentEtapa = misterio.etapas[currentIndex]
   const progress = Math.round(((currentIndex + 1) / misterio.etapas.length) * 100)
   const tones = misterio.etapas.map(beadTone)
   const layout = buildRosaryLayout(tones)
-  const { cross } = layout
+  const { cross, cord } = layout
+  const points = (list: { x: number; y: number }[]) =>
+    list.map(({ x, y }) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ')
   // The figure is taller than it is wide, so height is the scarce dimension.
   // Driving width off the height budget keeps the proportions exact.
   const widthAtHeightCap = (MAX_VIEWPORT_SHARE * VIEW_WIDTH) / layout.viewHeight
@@ -50,6 +52,23 @@ export function RosaryLoopProgress({ misterio, tipo, currentIndex }: Props) {
           className="absolute inset-0 h-full w-full text-[#c9b99a]"
           aria-hidden="true"
         >
+          <polygon
+            data-testid="progress-terco-cord-loop"
+            points={points(cord.loop)}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={cord.width}
+            strokeLinejoin="round"
+          />
+          <polyline
+            data-testid="progress-terco-cord-pendant"
+            points={points(cord.pendant)}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={cord.width}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
           <rect
             x={cross.x - cross.bar / 2}
             y={cross.top}

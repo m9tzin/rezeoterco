@@ -4,6 +4,7 @@ import { marianoData } from '@/data/mariano'
 import { misericordiaData } from '@/data/misericordia'
 import { novenaData } from '@/data/novenas'
 import { TERCO_LIST } from '@/data/index'
+import { pendantCount } from '@/components/rosary-loop-geometry'
 
 describe('RosaryProgress', () => {
   it('highlights the current Marian rosary bead and updates when the step changes', () => {
@@ -101,7 +102,7 @@ describe('RosaryProgress', () => {
     expect(screen.getByTestId('progress-bead-0')).toHaveAttribute('data-tone', 'intro')
   })
 
-  it('draws the physical rosary from beads and the cross alone, with no guide line', () => {
+  it('draws the physical rosary from beads, a solid cord and the cross — never a dashed guide', () => {
     const misterio = marianoData.misterios[0]
     render(<RosaryProgress misterio={misterio} tipo="mariano" currentIndex={0} layout="terco" />)
 
@@ -114,6 +115,23 @@ describe('RosaryProgress', () => {
       'preserveAspectRatio',
       'xMidYMid meet'
     )
+  })
+
+  it('threads the cord through the bead centres so it reads as one strung rosary', () => {
+    const misterio = marianoData.misterios[0]
+    render(<RosaryProgress misterio={misterio} tipo="mariano" currentIndex={0} layout="terco" />)
+
+    const loop = screen.getByTestId('progress-terco-cord-loop')
+    const pendant = screen.getByTestId('progress-terco-cord-pendant')
+    const vertices = (el: Element) => (el.getAttribute('points') ?? '').trim().split(/\s+/)
+
+    // A polygon closes itself, so the loop carries exactly one vertex per bead.
+    expect(loop.tagName.toLowerCase()).toBe('polygon')
+    expect(vertices(loop)).toHaveLength(misterio.etapas.length - pendantCount(misterio.etapas.length))
+    // The pendant runs medal -> beads -> cross, so it has two vertices beyond its beads.
+    expect(vertices(pendant)).toHaveLength(pendantCount(misterio.etapas.length) + 2)
+    expect(loop).toHaveAttribute('fill', 'none')
+    expect(pendant).toHaveAttribute('fill', 'none')
   })
 
   it('caps the rosary figure against the viewport height so it cannot push the prayer card under the fixed navigation', () => {

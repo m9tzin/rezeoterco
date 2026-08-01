@@ -36,12 +36,29 @@ describe('rosary loop geometry', () => {
     expect(layout.cross.top).toBeGreaterThan(pendant[0].y)
   })
 
-  it('leaves a light, uniform gap between plain beads', () => {
+  it('leaves plain beads clearly apart, with the cord showing between them', () => {
     const layout = buildRosaryLayout(tonesOf(72))
     const plain = layout.beads[10]
 
-    expect(plain.diameter / layout.spacing).toBeGreaterThan(0.65)
-    expect(plain.diameter / layout.spacing).toBeLessThan(0.85)
+    expect(plain.diameter / layout.spacing).toBeGreaterThan(0.5)
+    expect(plain.diameter / layout.spacing).toBeLessThan(0.65)
+  })
+
+  it('strings the cord through every bead centre, thin against the beads', () => {
+    const stem = pendantCount(72)
+    const layout = buildRosaryLayout(tonesOf(72))
+
+    expect(layout.cord.loop).toHaveLength(72 - stem)
+    layout.cord.loop.forEach((vertex, index) => {
+      expect(vertex).toEqual({ x: layout.beads[stem + index].x, y: layout.beads[stem + index].y })
+    })
+
+    // Medal at the top, the pendant beads bottom-up, then down into the cross.
+    expect(layout.cord.pendant).toHaveLength(stem + 2)
+    expect(layout.cord.pendant[0]).toEqual({ x: 50, y: layout.beads[stem].y })
+    expect(layout.cord.pendant[stem + 1]).toEqual({ x: 50, y: layout.cross.top })
+    expect(layout.cord.width).toBeLessThan(layout.beads[10].diameter * 0.3)
+    expect(layout.cord.width).toBeGreaterThan(0)
   })
 
   it('makes major beads and the medal at the base visibly larger', () => {

@@ -53,8 +53,8 @@ export function beadSurfaceClass(tone: BeadTone, state: BeadState): string {
  * instead of a fixed class. Kept in step with the sizes `beadClass` hands out.
  */
 export function beadScale(tone: BeadTone): number {
-  if (tone === 'major' || tone === 'final') return 1.35
-  if (tone === 'intro') return 1.15
+  if (tone === 'major' || tone === 'final') return 1.5
+  if (tone === 'intro') return 1.25
   return 1
 }
 

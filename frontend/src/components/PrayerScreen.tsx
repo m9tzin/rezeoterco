@@ -312,7 +312,7 @@ export function PrayerScreen({
       </div>
 
       {/* ── Navigation (fixed) ── */}
-      <div className="fixed bottom-12 left-0 right-0 px-4">
+      <div className="fixed bottom-4 left-0 right-0 px-4">
         <div className="flex justify-center gap-2 max-w-[560px] md:max-w-2xl lg:max-w-3xl mx-auto">
           <button
             onClick={handlePrev}

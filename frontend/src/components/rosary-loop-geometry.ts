@@ -99,16 +99,22 @@ export function pendantCount(total: number): number {
   return Math.min(5, Math.max(3, Math.round(total * 0.08)))
 }
 
-/** Bead diameter as a fraction of the bead-to-bead pitch — a light, even gap. */
-const MINOR_FILL = 0.73
+/**
+ * Bead diameter as a fraction of the bead-to-bead pitch. The beads stand clearly
+ * apart, with the cord showing through between them.
+ */
+const MINOR_FILL = 0.58
 /** Extra bulk for the bead that sits where the two flanks converge. */
-const MEDAL_SCALE = 1.75
+const MEDAL_SCALE = 2.25
+/** Cord thickness, relative to a plain bead, with a floor so it stays visible. */
+const CORD_RATIO = 0.16
+const MIN_CORD_WIDTH = 0.35
 /**
  * Ceiling on the pitch used for sizing. Short devotionals spread few beads over
- * the same cord, and sizing them straight off that pitch turns them into blobs;
+ * the same cord, and sizing them straight off that pitch makes them coarse;
  * past this point the gap widens instead of the beads growing.
  */
-const MAX_SIZING_PITCH = 6.4
+const MAX_SIZING_PITCH = 8
 
 /** Cross proportions, expressed in multiples of a plain bead's diameter. */
 const CROSS_WIDTH_RATIO = 4.6
@@ -134,11 +140,23 @@ export type CrossPlacement = {
   armTop: number
 }
 
+/**
+ * The thread the beads are strung on. `loop` is the closed ring of loop-bead
+ * centres; `pendant` runs from the medal down through the pendant beads into
+ * the top of the cross.
+ */
+export type CordPlacement = {
+  loop: Point[]
+  pendant: Point[]
+  width: number
+}
+
 export type RosaryLayout = {
   viewHeight: number
   spacing: number
   beads: BeadPlacement[]
   cross: CrossPlacement
+  cord: CordPlacement
 }
 
 /**
@@ -181,6 +199,15 @@ export function buildRosaryLayout(tones: BeadTone[]): RosaryLayout {
   const pendantBottom = JUNCTION.y + Math.max(stem, 1) * spacing
   const crossTop = pendantBottom + Math.max(spacing * 1.1, 4)
 
+  // Threading the bead centres in prayer order: down the pendant from the medal
+  // into the cross, and around the closed loop.
+  const pendantCord = [
+    JUNCTION,
+    ...beads.slice(0, stem).map(({ x, y }) => ({ x, y })).reverse(),
+    { x: JUNCTION.x, y: crossTop },
+  ]
+  const loopCord = beads.slice(stem).map(({ x, y }) => ({ x, y }))
+
   return {
     viewHeight: crossTop + height + BOTTOM_MARGIN,
     spacing,
@@ -192,6 +219,11 @@ export function buildRosaryLayout(tones: BeadTone[]): RosaryLayout {
       height,
       bar: width * CROSS_BAR_RATIO,
       armTop: crossTop + height * CROSS_ARM_RATIO,
+    },
+    cord: {
+      loop: loopCord,
+      pendant: pendantCord,
+      width: Math.max(minorDiameter * CORD_RATIO, MIN_CORD_WIDTH),
     },
   }
 }
