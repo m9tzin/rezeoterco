@@ -40,6 +40,52 @@ describe('Home prayer flow', () => {
     expect(screen.queryByText('Credo')).not.toBeInTheDocument()
   })
 
+  it('returns to the selection screen from the lower back button on the first step', async () => {
+    render(<Home />)
+
+    expect(await screen.findByText('Versículo do dia')).toBeInTheDocument()
+
+    fireEvent.click(await screen.findByRole('button', { name: /Mistérios Gozosos/ }))
+    expect(screen.getByText('Credo')).toBeInTheDocument()
+
+    const lowerBackButton = screen.getByRole('button', { name: 'Voltar à tela inicial' })
+    expect(lowerBackButton).not.toBeDisabled()
+
+    fireEvent.click(lowerBackButton)
+
+    expect(screen.getByText('Versículo do dia')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continuar' })).toBeInTheDocument()
+    expect(screen.getByText(/etapa 1\./)).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Continuar' }))
+
+    expect(screen.getByText('Credo')).toBeInTheDocument()
+  })
+
+  it('keeps the lower back button moving to the previous step after the first step', async () => {
+    render(<Home />)
+
+    expect(await screen.findByText('Versículo do dia')).toBeInTheDocument()
+
+    fireEvent.click(await screen.findByRole('button', { name: /Mistérios Gozosos/ }))
+    expect(screen.getByText('Credo')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Próxima etapa' }))
+    act(() => {
+      jest.advanceTimersByTime(150)
+    })
+
+    expect(await screen.findByText('Pai Nosso')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Etapa anterior' }))
+    act(() => {
+      jest.advanceTimersByTime(150)
+    })
+
+    expect(await screen.findByText('Credo')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Continuar' })).not.toBeInTheDocument()
+  })
+
   it('shows and starts the requested novenas from the selection screen', async () => {
     render(<Home />)
 

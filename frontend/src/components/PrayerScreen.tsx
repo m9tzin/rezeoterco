@@ -116,8 +116,13 @@ export function PrayerScreen({
   const handlePrev = useCallback(() => {
     stopContinuous()
     stop()
-    if (canGoPrev(index)) go(prevIndex(index))
-  }, [index, go, stop, stopContinuous])
+    if (canGoPrev(index)) {
+      go(prevIndex(index))
+      return
+    }
+
+    onBack()
+  }, [index, go, onBack, stop, stopContinuous])
 
   const handleBack = useCallback(() => {
     stopContinuous()
@@ -141,6 +146,7 @@ export function PrayerScreen({
   const fontIndex = SIZES.indexOf(fontSize)
   const percent = Math.round(((index + 1) / total) * 100)
   const isLast = !canGoNext(index, total)
+  const canReturnToPreviousStep = canGoPrev(index)
 
   return (
     <div className="min-h-screen bg-cream flex flex-col items-center px-4 pb-36">
@@ -275,8 +281,7 @@ export function PrayerScreen({
         <div className="flex justify-center gap-2 max-w-[560px] mx-auto">
           <button
             onClick={handlePrev}
-            disabled={!canGoPrev(index)}
-            aria-label="Etapa anterior"
+            aria-label={canReturnToPreviousStep ? 'Etapa anterior' : 'Voltar à tela inicial'}
             className="font-cormorant text-base px-5 min-h-[52px] border border-gold/60 bg-parchment text-brown disabled:opacity-30 hover:bg-[#e5d9c0] transition-colors rounded-sm active:scale-[0.97] shrink-0"
           >
             ← Voltar
