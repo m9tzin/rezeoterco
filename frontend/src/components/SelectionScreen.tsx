@@ -1,15 +1,17 @@
 'use client'
 
 import { useEffect, useState, type ReactNode } from 'react'
-import type { TipoTerco, Progress } from '@/data/types'
+import type { TipoTerco, Progress, ProgressLayout } from '@/data/types'
 import { TERCOS, TERCO_LIST } from '@/data/index'
 import { VerseOfDay } from './VerseOfDay'
 
 type Props = {
   savedProgress: Progress | null
+  progressLayout: ProgressLayout
   onSelectMisterio: (tipo: TipoTerco, misterioId: string) => void
   onResume: () => void
   onDismissProgress: () => void
+  onProgressLayoutChange: (layout: ProgressLayout) => void
 }
 
 const CruzSVG = (
@@ -83,9 +85,11 @@ function getTodayMisterioId(): string {
 
 export function SelectionScreen({
   savedProgress,
+  progressLayout,
   onSelectMisterio,
   onResume,
   onDismissProgress,
+  onProgressLayoutChange,
 }: Props) {
   const [activeTipo, setActiveTipo] = useState<TipoTerco>(savedProgress?.tipo ?? 'mariano')
   const activeTerco = TERCOS[activeTipo]
@@ -135,6 +139,32 @@ export function SelectionScreen({
       </div>
 
       <VerseOfDay />
+
+      <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl mb-7">
+        <p className="font-cormorant font-semibold text-base text-terco-muted/80 mb-3 tracking-wide">
+          Formato do progresso
+        </p>
+        <div className="inline-flex rounded-sm border border-parchment bg-white p-1">
+          {([
+            ['linear', 'Pedras'],
+            ['terco', 'Terço'],
+          ] as const).map(([layout, label]) => (
+            <button
+              key={layout}
+              type="button"
+              onClick={() => onProgressLayoutChange(layout)}
+              aria-pressed={progressLayout === layout}
+              className={`min-h-[40px] px-4 rounded-sm font-cormorant text-base transition-colors ${
+                progressLayout === layout
+                  ? 'bg-brown text-cream shadow-[0_1px_4px_rgba(92,61,46,0.16)]'
+                  : 'text-terco-muted hover:text-brown'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Resume banner */}
       {savedProgress && (

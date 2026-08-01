@@ -153,4 +153,27 @@ describe('Home prayer flow', () => {
     expect(screen.getByText('Terço das Santas Chagas')).toBeInTheDocument()
     expect(screen.getByText('Sinal da Cruz')).toBeInTheDocument()
   })
+
+  it('persists and uses the selected progress layout', async () => {
+    render(<Home />)
+
+    expect(await screen.findByText('Versículo do dia')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Pedras' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Terço' }))
+
+    expect(screen.getByRole('button', { name: 'Terço' })).toHaveAttribute('aria-pressed', 'true')
+    expect(JSON.parse(localStorage.getItem('terco-preferences') ?? '{}')).toEqual({
+      fontSize: 'normal',
+      progressLayout: 'terco',
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /Mistérios Gozosos/ }))
+
+    expect(screen.getByTestId('progress-terco-layout')).toBeInTheDocument()
+    expect(screen.queryByTestId('progress-linear-layout')).not.toBeInTheDocument()
+  })
 })

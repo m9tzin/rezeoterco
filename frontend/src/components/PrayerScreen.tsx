@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import type { Misterio, FontSize, TipoTerco } from '@/data/types'
+import type { Misterio, FontSize, ProgressLayout, TipoTerco } from '@/data/types'
 import { canGoNext, canGoPrev, nextIndex, prevIndex } from '@/lib/navigation'
 import { useSpeechSynthesis } from '@/lib/useSpeechSynthesis'
 import { RosaryProgress } from './RosaryProgress'
@@ -19,6 +19,7 @@ type Props = {
   tipo: TipoTerco
   initialIndex: number
   fontSize: FontSize
+  progressLayout: ProgressLayout
   onFontChange: (size: FontSize) => void
   onComplete: () => void
   onStepChange: (index: number) => void
@@ -30,6 +31,7 @@ export function PrayerScreen({
   tipo,
   initialIndex,
   fontSize,
+  progressLayout,
   onFontChange,
   onComplete,
   onStepChange,
@@ -200,7 +202,12 @@ export function PrayerScreen({
         </div>
       </div>
 
-      <RosaryProgress misterio={misterio} tipo={tipo} currentIndex={index} />
+      <RosaryProgress
+        misterio={misterio}
+        tipo={tipo}
+        currentIndex={index}
+        layout={progressLayout}
+      />
 
       {/* ── Prayer card ── */}
       <div

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { TipoTerco, FontSize, Progress } from '@/data/types'
+import type { TipoTerco, FontSize, Progress, ProgressLayout } from '@/data/types'
 import { TERCOS } from '@/data/index'
 import { saveProgress, loadProgress, clearProgress, savePreferences, loadPreferences } from '@/lib/storage'
 import { SelectionScreen } from '@/components/SelectionScreen'
@@ -16,6 +16,7 @@ export default function Home() {
   const [misterioId, setMisterioId] = useState<string>('gozosos')
   const [etapaIndex, setEtapaIndex] = useState(0)
   const [fontSize, setFontSize] = useState<FontSize>('normal')
+  const [progressLayout, setProgressLayout] = useState<ProgressLayout>('linear')
   const [savedProgress, setSavedProgress] = useState<Progress | null>(null)
   const [hydrated, setHydrated] = useState(false)
 
@@ -24,6 +25,7 @@ export default function Home() {
     const prefs = loadPreferences()
     setSavedProgress(progress)
     setFontSize(prefs.fontSize)
+    setProgressLayout(prefs.progressLayout)
     setHydrated(true)
   }, [])
 
@@ -76,7 +78,12 @@ export default function Home() {
 
   function handleFontChange(size: FontSize) {
     setFontSize(size)
-    savePreferences({ fontSize: size })
+    savePreferences({ fontSize: size, progressLayout })
+  }
+
+  function handleProgressLayoutChange(layout: ProgressLayout) {
+    setProgressLayout(layout)
+    savePreferences({ fontSize, progressLayout: layout })
   }
 
   if (!hydrated) return null
@@ -89,9 +96,11 @@ export default function Home() {
         {view === 'selection' && (
           <SelectionScreen
             savedProgress={savedProgress}
+            progressLayout={progressLayout}
             onSelectMisterio={handleSelectMisterio}
             onResume={handleResume}
             onDismissProgress={handleDismissProgress}
+            onProgressLayoutChange={handleProgressLayoutChange}
           />
         )}
         {view === 'praying' && misterio && (
@@ -100,6 +109,7 @@ export default function Home() {
             tipo={tipo}
             initialIndex={etapaIndex}
             fontSize={fontSize}
+            progressLayout={progressLayout}
             onFontChange={handleFontChange}
             onComplete={handleComplete}
             onStepChange={handleStepChange}
