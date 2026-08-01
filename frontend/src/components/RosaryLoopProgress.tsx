@@ -10,12 +10,12 @@ type Props = {
 }
 
 function getBeadPosition(index: number, total: number): { x: number; y: number } {
-  const angle = -100 + (index / total) * 360
+  const angle = -95 + (index / total) * 360
   const radians = (angle * Math.PI) / 180
 
   return {
-    x: 50 + Math.cos(radians) * 42,
-    y: 45 + Math.sin(radians) * 34,
+    x: 50 + Math.cos(radians) * 38,
+    y: 39 + Math.sin(radians) * 31,
   }
 }
 
@@ -29,27 +29,41 @@ export function RosaryLoopProgress({ misterio, tipo, currentIndex }: Props) {
       aria-label={`Figura do progresso em formato de terço: ${describeTipo(tipo)}`}
     >
       <div
-        className="relative mx-auto h-[228px] w-full max-w-[360px]"
+        className="relative mx-auto h-[300px] w-full max-w-[360px]"
         role="list"
         data-testid="progress-terco-layout"
       >
         <svg
           viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          data-testid="progress-terco-guide"
           className="absolute inset-0 h-full w-full text-parchment"
           aria-hidden="true"
         >
           <ellipse
             cx="50"
-            cy="45"
-            rx="42"
-            ry="34"
+            cy="39"
+            rx="38"
+            ry="31"
             fill="none"
             stroke="currentColor"
-            strokeWidth="0.7"
-            strokeDasharray="1.5 3"
+            strokeWidth="0.55"
+            strokeDasharray="1.2 2.4"
           />
-          <path d="M50 79 L50 90" stroke="currentColor" strokeWidth="0.9" />
-          <path d="M50 88 L50 98 M45 92 L55 92" stroke="currentColor" strokeWidth="1.5" />
+          <path
+            d="M50 70 C50 73 50 75 50 78 M50 81 L50 91"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="0.8"
+          />
+          <circle cx="50" cy="79" r="2.2" fill="none" stroke="currentColor" strokeWidth="0.75" />
+          <path
+            d="M50 88 L50 99 M45 93 L55 93"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.35"
+            strokeLinecap="round"
+          />
         </svg>
 
         {misterio.etapas.map((etapa, index) => {

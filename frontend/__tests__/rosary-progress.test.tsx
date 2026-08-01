@@ -95,6 +95,10 @@ describe('RosaryProgress', () => {
     rerender(<RosaryProgress misterio={misterio} tipo="mariano" currentIndex={0} layout="terco" />)
 
     expect(screen.getByTestId('progress-terco-layout')).toBeInTheDocument()
+    expect(screen.getByTestId('progress-terco-guide')).toHaveAttribute(
+      'preserveAspectRatio',
+      'none'
+    )
     expect(screen.queryByTestId('progress-linear-layout')).not.toBeInTheDocument()
     expect(screen.getByTestId('progress-bead-0')).toHaveAttribute('data-current', 'true')
     expect(screen.getByTestId('progress-bead-0')).toHaveAttribute('data-tone', 'intro')
