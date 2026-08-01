@@ -95,14 +95,25 @@ describe('RosaryProgress', () => {
     rerender(<RosaryProgress misterio={misterio} tipo="mariano" currentIndex={0} layout="terco" />)
 
     expect(screen.getByTestId('progress-terco-layout')).toBeInTheDocument()
-    expect(screen.getByTestId('progress-terco-guide')).toHaveAttribute(
-      'preserveAspectRatio',
-      'none'
-    )
-    expect(screen.getByTestId('progress-terco-guide-loop')).toBeInTheDocument()
+    expect(screen.getByTestId('progress-terco-cross')).toBeInTheDocument()
     expect(screen.queryByTestId('progress-linear-layout')).not.toBeInTheDocument()
     expect(screen.getByTestId('progress-bead-0')).toHaveAttribute('data-current', 'true')
     expect(screen.getByTestId('progress-bead-0')).toHaveAttribute('data-tone', 'intro')
+  })
+
+  it('draws the physical rosary from beads and the cross alone, with no guide line', () => {
+    const misterio = marianoData.misterios[0]
+    render(<RosaryProgress misterio={misterio} tipo="mariano" currentIndex={0} layout="terco" />)
+
+    const figure = screen.getByTestId('progress-terco-layout')
+
+    expect(figure.querySelectorAll('[stroke-dasharray]')).toHaveLength(0)
+    expect(figure.querySelectorAll('path')).toHaveLength(0)
+    expect(figure.querySelectorAll('svg')).toHaveLength(1)
+    expect(screen.getByTestId('progress-terco-cross')).toHaveAttribute(
+      'preserveAspectRatio',
+      'xMidYMid meet'
+    )
   })
 
   it('renders the physical rosary layout for every registered devotional type', () => {

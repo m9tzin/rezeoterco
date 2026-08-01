@@ -35,6 +35,29 @@ export function beadTone(etapa: Etapa): BeadTone {
   return 'minor'
 }
 
+/** Colour and emphasis of a bead, with no size baked in. */
+export function beadSurfaceClass(tone: BeadTone, state: BeadState): string {
+  if (state === 'current') {
+    return 'bg-red-800 border-red-800 shadow-[0_0_0_5px_rgba(139,32,32,0.16)] scale-125'
+  }
+
+  if (state === 'done') {
+    return tone === 'major' || tone === 'final' ? 'bg-brown border-brown' : 'bg-gold border-gold'
+  }
+
+  return 'bg-parchment border-[#c9b99a]'
+}
+
+/**
+ * Relative bead diameter, for layouts that size beads from their own geometry
+ * instead of a fixed class. Kept in step with the sizes `beadClass` hands out.
+ */
+export function beadScale(tone: BeadTone): number {
+  if (tone === 'major' || tone === 'final') return 1.35
+  if (tone === 'intro') return 1.15
+  return 1
+}
+
 export function beadClass(
   tone: BeadTone,
   state: BeadState,
@@ -49,17 +72,7 @@ export function beadClass(
         ? 'h-2 w-2'
         : 'h-2.5 w-2.5'
 
-  if (state === 'current') {
-    return `${size} bg-red-800 border-red-800 shadow-[0_0_0_5px_rgba(139,32,32,0.16)] scale-125`
-  }
-
-  if (state === 'done') {
-    return `${size} ${
-      tone === 'major' || tone === 'final' ? 'bg-brown border-brown' : 'bg-gold border-gold'
-    }`
-  }
-
-  return `${size} bg-parchment border-[#c9b99a]`
+  return `${size} ${beadSurfaceClass(tone, state)}`
 }
 
 export function describeTipo(tipo: TipoTerco): string {
