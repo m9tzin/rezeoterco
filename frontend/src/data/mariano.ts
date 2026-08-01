@@ -2,11 +2,11 @@ import type { Etapa, Misterio, TercoData } from './types'
 
 const CREDO = `Creio em Deus Pai todo-poderoso, criador do céu e da terra; e em Jesus Cristo, seu único Filho, Nosso Senhor; que foi concebido pelo poder do Espírito Santo; nasceu da Virgem Maria; padeceu sob Pôncio Pilatos; foi crucificado, morto e sepultado; desceu à mansão dos mortos; no terceiro dia ressuscitou dos mortos; subiu aos céus; está sentado à direita de Deus Pai todo-poderoso; d'onde há de vir a julgar os vivos e os mortos. Creio no Espírito Santo; na Santa Igreja Católica; na comunhão dos santos; na remissão dos pecados; na ressurreição da carne; e na vida eterna. Amém.`
 
-const PAI_NOSSO = `Pai nosso que estais no céu, santificado seja o vosso nome; venha a nós o vosso reino; seja feita a vossa vontade assim na terra como no céu. O pão nosso de cada dia nos dai hoje; perdoai-nos as nossas ofensas assim como nós perdoamos a quem nos tem ofendido; e não nos deixeis cair em tentação, mas livrai-nos do mal. Amém.`
+export const PAI_NOSSO = `Pai nosso que estais no céu, santificado seja o vosso nome; venha a nós o vosso reino; seja feita a vossa vontade assim na terra como no céu. O pão nosso de cada dia nos dai hoje; perdoai-nos as nossas ofensas assim como nós perdoamos a quem nos tem ofendido; e não nos deixeis cair em tentação, mas livrai-nos do mal. Amém.`
 
-const AVE_MARIA = `Ave Maria, cheia de graça, o Senhor é convosco; bendita sois vós entre as mulheres e bendito é o fruto do vosso ventre, Jesus. Santa Maria, Mãe de Deus, rogai por nós pecadores, agora e na hora da nossa morte. Amém.`
+export const AVE_MARIA = `Ave Maria, cheia de graça, o Senhor é convosco; bendita sois vós entre as mulheres e bendito é o fruto do vosso ventre, Jesus. Santa Maria, Mãe de Deus, rogai por nós pecadores, agora e na hora da nossa morte. Amém.`
 
-const GLORIA = `Glória ao Pai, ao Filho e ao Espírito Santo. Como era no princípio, agora e sempre, e pelos séculos dos séculos. Amém.`
+export const GLORIA = `Glória ao Pai, ao Filho e ao Espírito Santo. Como era no princípio, agora e sempre, e pelos séculos dos séculos. Amém.`
 
 const FATIMA = `Ó meu Jesus, perdoai-nos os nossos pecados, preservai-nos do fogo do inferno, levai as almas todas para o céu, especialmente as que mais precisarem da vossa misericórdia. Amém.`
 

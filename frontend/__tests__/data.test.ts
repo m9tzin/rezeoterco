@@ -1,4 +1,4 @@
-import { marianoData } from '@/data/mariano'
+import { AVE_MARIA, GLORIA, PAI_NOSSO, marianoData } from '@/data/mariano'
 import { TERCO_LIST, TERCOS } from '@/data/index'
 import { novenaData } from '@/data/novenas'
 
@@ -202,14 +202,25 @@ describe('Novenas', () => {
     ])
   })
 
-  it('each novena has 9 non-empty day steps', () => {
+  it('each novena has 9 days with complete prayer steps', () => {
     novenaData.misterios.forEach((novena) => {
-      expect(novena.etapas).toHaveLength(9)
-      expect(novena.etapas.map((etapa) => etapa.tipo)).toEqual(Array(9).fill('novena-dia'))
-      novena.etapas.forEach((etapa, index) => {
-        expect(etapa.label).toContain(`Dia ${index + 1}/9`)
-        expect(etapa.texto.length).toBeGreaterThan(0)
-      })
+      expect(novena.etapas).toHaveLength(36)
+
+      for (let day = 0; day < 9; day++) {
+        const daySteps = novena.etapas.slice(day * 4, day * 4 + 4)
+
+        expect(daySteps.map((etapa) => etapa.tipo)).toEqual([
+          'novena-dia',
+          'pai-nosso',
+          'ave-maria',
+          'gloria',
+        ])
+        expect(daySteps[0].label).toContain(`Dia ${day + 1}/9`)
+        expect(daySteps[0].texto).not.toContain('Pai Nosso, Ave Maria e Glória ao Pai')
+        expect(daySteps[1]).toMatchObject({ label: 'Pai Nosso', texto: PAI_NOSSO })
+        expect(daySteps[2]).toMatchObject({ label: 'Ave Maria', texto: AVE_MARIA })
+        expect(daySteps[3]).toMatchObject({ label: 'Glória', texto: GLORIA })
+      }
     })
   })
 })

@@ -35,15 +35,15 @@ describe('RosaryProgress', () => {
     expect(screen.getByText('Oferecimento — 1ª Dezena · 10%')).toBeInTheDocument()
   })
 
-  it('renders novena days as a devotional progress figure', () => {
+  it('renders novena days and prayers as a devotional progress figure', () => {
     const misterio = novenaData.misterios[1]
     render(<RosaryProgress misterio={misterio} tipo="novena" currentIndex={4} />)
 
     expect(screen.getByRole('region', { name: /dias da novena/i })).toBeInTheDocument()
-    expect(screen.getAllByRole('listitem')).toHaveLength(9)
+    expect(screen.getAllByRole('listitem')).toHaveLength(36)
     expect(screen.getByTestId('progress-bead-4')).toHaveAttribute('data-current', 'true')
     expect(screen.getByTestId('progress-bead-4')).toHaveAttribute('data-tone', 'major')
-    expect(screen.getByText('Dia 5/9 — Família · 56%')).toBeInTheDocument()
+    expect(screen.getByText('Dia 2/9 — Palavra de Deus · 14%')).toBeInTheDocument()
   })
 
   it('derives the visual sequence length from every registered devotional type', () => {

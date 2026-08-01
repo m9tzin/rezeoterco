@@ -62,6 +62,27 @@ describe('Home prayer flow', () => {
       jest.advanceTimersByTime(150)
     })
 
+    expect(await screen.findByText('Pai Nosso')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Próxima etapa' }))
+    act(() => {
+      jest.advanceTimersByTime(150)
+    })
+
+    expect(await screen.findByText('Ave Maria')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Próxima etapa' }))
+    act(() => {
+      jest.advanceTimersByTime(150)
+    })
+
+    expect(await screen.findByText('Glória')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Próxima etapa' }))
+    act(() => {
+      jest.advanceTimersByTime(150)
+    })
+
     expect(await screen.findByText('Dia 2/9 — Palavra de Deus')).toBeInTheDocument()
   })
 
