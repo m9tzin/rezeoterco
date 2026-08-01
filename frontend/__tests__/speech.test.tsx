@@ -14,6 +14,7 @@ type MockUtterance = {
 }
 
 let voicesChangedHandler: (() => void) | null = null
+const SPEAK_AFTER_CANCEL_DELAY_MS = 75
 
 const speechSynthesisMock = {
   speak: jest.fn(),
@@ -89,6 +90,12 @@ function renderPrayerScreen({
   )
 }
 
+function startQueuedSpeech() {
+  act(() => {
+    jest.advanceTimersByTime(SPEAK_AFTER_CANCEL_DELAY_MS)
+  })
+}
+
 beforeEach(() => {
   jest.useFakeTimers()
   voicesChangedHandler = null
@@ -121,6 +128,7 @@ describe('speech synthesis controls', () => {
     speechSynthesisMock.cancel.mockClear()
 
     fireEvent.click(listenButton)
+    startQueuedSpeech()
 
     expect(speechSynthesisMock.cancel).toHaveBeenCalledTimes(1)
     expect(speechSynthesisMock.speak).toHaveBeenCalledTimes(1)
@@ -152,6 +160,7 @@ describe('speech synthesis controls', () => {
     speechSynthesisMock.cancel.mockClear()
 
     fireEvent.click(listenButton)
+    startQueuedSpeech()
     fireEvent.click(screen.getByRole('button', { name: 'Parar leitura contínua' }))
 
     expect(speechSynthesisMock.cancel.mock.calls.length).toBeGreaterThanOrEqual(2)
@@ -172,6 +181,7 @@ describe('speech synthesis controls', () => {
     speechSynthesisMock.cancel.mockClear()
 
     fireEvent.click(listenButton)
+    startQueuedSpeech()
     fireEvent.click(screen.getByRole('button', { name: 'Próxima etapa' }))
     act(() => {
       jest.advanceTimersByTime(150)
@@ -209,12 +219,35 @@ describe('speech synthesis controls', () => {
     speechSynthesisMock.cancel.mockClear()
 
     fireEvent.click(listenButton)
+    startQueuedSpeech()
 
     const utterance = speechSynthesisMock.speak.mock.calls[0][0] as MockUtterance
     expect(utterance.voice).toBe(localNaturalPtBrVoice)
     expect(utterance.lang).toBe('pt-BR')
     expect(utterance.rate).toBe(0.9)
     expect(utterance.pitch).toBe(1)
+  })
+
+  it('prefers a high-quality Google pt-BR voice over a generic local pt-BR voice', async () => {
+    const remoteGooglePtBrVoice = makeVoice('Google português do Brasil', 'pt-BR', false)
+    const localGenericPtBrVoice = makeVoice('Brazilian Portuguese', 'pt-BR', true)
+    speechSynthesisMock.getVoices.mockReturnValue([localGenericPtBrVoice, remoteGooglePtBrVoice])
+
+    renderPrayerScreen()
+
+    const listenButton = await screen.findByRole('button', {
+      name: 'Iniciar leitura contínua',
+    })
+    await waitFor(() => expect(listenButton).not.toBeDisabled())
+    speechSynthesisMock.speak.mockClear()
+    speechSynthesisMock.cancel.mockClear()
+
+    fireEvent.click(listenButton)
+    startQueuedSpeech()
+
+    const utterance = speechSynthesisMock.speak.mock.calls[0][0] as MockUtterance
+    expect(utterance.voice).toBe(remoteGooglePtBrVoice)
+    expect(utterance.lang).toBe('pt-BR')
   })
 
   it('loads voices from voiceschanged and falls back to another Portuguese voice', async () => {
@@ -238,6 +271,7 @@ describe('speech synthesis controls', () => {
     speechSynthesisMock.cancel.mockClear()
 
     fireEvent.click(listenButton)
+    startQueuedSpeech()
 
     const utterance = speechSynthesisMock.speak.mock.calls[0][0] as MockUtterance
     expect(utterance.voice).toBe(ptPtVoice)
@@ -260,6 +294,7 @@ describe('speech synthesis controls', () => {
     speechSynthesisMock.cancel.mockClear()
 
     fireEvent.click(listenButton)
+    startQueuedSpeech()
 
     const utterance = speechSynthesisMock.speak.mock.calls[0][0] as MockUtterance
     expect(utterance.voice).toBeNull()
@@ -290,6 +325,7 @@ describe('speech synthesis controls', () => {
     speechSynthesisMock.cancel.mockClear()
 
     fireEvent.click(listenButton)
+    startQueuedSpeech()
 
     expect(speechSynthesisMock.speak).toHaveBeenCalledTimes(1)
     const firstUtterance = speechSynthesisMock.speak.mock.calls[0][0] as MockUtterance
@@ -302,6 +338,7 @@ describe('speech synthesis controls', () => {
       firstUtterance.onend?.()
       jest.advanceTimersByTime(150)
     })
+    startQueuedSpeech()
 
     expect(await screen.findByText('Etapa 2')).toBeInTheDocument()
     await waitFor(() => expect(speechSynthesisMock.speak).toHaveBeenCalledTimes(2))
@@ -314,6 +351,7 @@ describe('speech synthesis controls', () => {
       secondUtterance.onend?.()
       jest.advanceTimersByTime(150)
     })
+    startQueuedSpeech()
 
     expect(await screen.findByText('Etapa 3')).toBeInTheDocument()
     await waitFor(() => expect(speechSynthesisMock.speak).toHaveBeenCalledTimes(3))
@@ -348,6 +386,7 @@ describe('speech synthesis controls', () => {
     speechSynthesisMock.cancel.mockClear()
 
     fireEvent.click(listenButton)
+    startQueuedSpeech()
 
     const utterance = speechSynthesisMock.speak.mock.calls[0][0] as MockUtterance
     fireEvent.click(screen.getByRole('button', { name: 'Parar leitura contínua' }))
