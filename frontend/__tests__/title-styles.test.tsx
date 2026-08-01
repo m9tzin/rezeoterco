@@ -47,6 +47,7 @@ describe('title typography', () => {
         fontSize="normal"
         progressLayout="linear"
         onFontChange={jest.fn()}
+        onProgressLayoutChange={jest.fn()}
         onComplete={jest.fn()}
         onStepChange={jest.fn()}
         onBack={jest.fn()}

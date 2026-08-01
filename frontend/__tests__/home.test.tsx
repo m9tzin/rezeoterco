@@ -219,4 +219,29 @@ describe('Home prayer flow', () => {
     expect(screen.getByTestId('progress-terco-layout')).toBeInTheDocument()
     expect(screen.queryByTestId('progress-linear-layout')).not.toBeInTheDocument()
   })
+
+  it('changes the progress layout from the prayer screen without losing the current step', async () => {
+    render(<Home />)
+
+    await goToSelection()
+    fireEvent.click(await screen.findByRole('button', { name: /Mistérios Gozosos/ }))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Próxima etapa' }))
+    act(() => {
+      jest.advanceTimersByTime(150)
+    })
+
+    expect(await screen.findByText('Pai Nosso')).toBeInTheDocument()
+    expect(screen.getByTestId('progress-linear-layout')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Terço' }))
+
+    expect(screen.getByText('Pai Nosso')).toBeInTheDocument()
+    expect(screen.getByTestId('progress-terco-layout')).toBeInTheDocument()
+    expect(screen.queryByTestId('progress-linear-layout')).not.toBeInTheDocument()
+    expect(JSON.parse(localStorage.getItem('terco-preferences') ?? '{}')).toEqual({
+      fontSize: 'normal',
+      progressLayout: 'terco',
+    })
+  })
 })

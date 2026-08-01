@@ -84,6 +84,7 @@ function renderPrayerScreen({
       fontSize="normal"
       progressLayout="linear"
       onFontChange={jest.fn()}
+      onProgressLayoutChange={jest.fn()}
       onComplete={onComplete}
       onStepChange={onStepChange}
       onBack={jest.fn()}

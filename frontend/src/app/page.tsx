@@ -124,6 +124,7 @@ export default function Home() {
             fontSize={fontSize}
             progressLayout={progressLayout}
             onFontChange={handleFontChange}
+            onProgressLayoutChange={handleProgressLayoutChange}
             onComplete={handleComplete}
             onStepChange={handleStepChange}
             onBack={handleBack}
