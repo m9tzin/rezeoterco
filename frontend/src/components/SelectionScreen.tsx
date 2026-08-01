@@ -99,7 +99,7 @@ export function SelectionScreen({
   return (
     <div className="bg-cream flex flex-col items-center px-4 pb-8">
       {/* Hero */}
-      <div className="w-full max-w-lg text-center pt-14 pb-8">
+      <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl text-center pt-14 pb-8">
         <svg
           width="26"
           height="42"
@@ -123,7 +123,7 @@ export function SelectionScreen({
             beta
           </span>
         </div>
-        <p className="font-garamond italic text-terco-muted text-lg leading-relaxed max-w-[18rem] mx-auto">
+        <p className="font-garamond italic text-terco-muted text-lg leading-relaxed max-w-[18rem] md:max-w-xl mx-auto">
           Guia passo a passo para rezar o terço com calma e devoção.
         </p>
 
@@ -138,7 +138,7 @@ export function SelectionScreen({
 
       {/* Resume banner */}
       {savedProgress && (
-        <div className="w-full max-w-lg mb-7 border border-gold/40 rounded-sm px-5 py-4 bg-[#faf8f3] shadow-[0_1px_8px_rgba(154,123,63,0.08)]">
+        <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl mb-7 border border-gold/40 rounded-sm px-5 py-4 bg-[#faf8f3] shadow-[0_1px_8px_rgba(154,123,63,0.08)]">
           <p className="font-garamond italic text-terco-text text-base mb-4 leading-relaxed">
             Você parou em{' '}
             <strong className="font-normal not-italic text-brown">
@@ -166,7 +166,7 @@ export function SelectionScreen({
       )}
 
       {/* Terço type selector */}
-      <div className="w-full max-w-lg mb-7">
+      <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl mb-7">
         <p className="font-cormorant font-semibold text-base text-terco-muted/80 mb-3 tracking-wide">
           Tipo de devoção
         </p>
@@ -196,7 +196,7 @@ export function SelectionScreen({
 
       {/* Option cards */}
       {hasMultipleOptions && (
-        <div className="w-full max-w-lg">
+        <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl">
           <div className="flex items-baseline justify-between mb-4">
             <p className="font-cormorant font-semibold text-lg text-terco-muted">
               {activeTipo === 'novena' ? 'Escolha a novena' : 'Escolha o mistério'}
@@ -288,7 +288,7 @@ export function SelectionScreen({
 
       {/* Single-sequence CTA */}
       {!hasMultipleOptions && (
-        <div className="w-full max-w-lg mt-2">
+        <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl mt-2">
           <button
             onClick={() => {
               const misterio = TERCOS[activeTipo].misterios[0]

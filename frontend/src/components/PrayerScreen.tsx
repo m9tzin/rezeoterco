@@ -152,7 +152,7 @@ export function PrayerScreen({
     <div className="min-h-screen bg-cream flex flex-col items-center px-4 pb-36">
 
       {/* ── Header ── */}
-      <div className="w-full max-w-[560px] pt-5 pb-3">
+      <div className="w-full max-w-[560px] md:max-w-2xl lg:max-w-3xl pt-5 pb-3">
         <div className="flex items-center justify-between mb-5">
           <button
             onClick={handleBack}
@@ -174,7 +174,7 @@ export function PrayerScreen({
             </svg>
             Início
           </button>
-          <p className="font-cormorant font-semibold text-lg text-brown truncate ml-4 max-w-[240px]">
+          <p className="font-cormorant font-semibold text-lg text-brown truncate ml-4 max-w-[240px] md:max-w-md lg:max-w-xl">
             {misterio.titulo}
           </p>
         </div>
@@ -206,7 +206,7 @@ export function PrayerScreen({
       <div
         ref={cardRef}
         data-speaking={isListening}
-        className={`w-full max-w-[560px] bg-white border rounded-sm px-7 py-7 mb-5 transition-all duration-150 ${
+        className={`w-full max-w-[560px] md:max-w-2xl lg:max-w-3xl bg-white border rounded-sm px-7 py-7 mb-5 transition-all duration-150 ${
           isListening
             ? 'border-gold shadow-[0_0_0_3px_rgba(154,123,63,0.16),0_2px_20px_rgba(92,61,46,0.12)]'
             : 'border-parchment shadow-[0_2px_20px_rgba(92,61,46,0.09)]'
@@ -237,7 +237,7 @@ export function PrayerScreen({
       </div>
 
       {/* ── Font size controls ── */}
-      <div className="flex items-center gap-3 w-full max-w-[560px] mb-1">
+      <div className="flex items-center gap-3 w-full max-w-[560px] md:max-w-2xl lg:max-w-3xl mb-1">
         <span className="font-cormorant text-sm text-terco-muted/70 tracking-wide">
           Tamanho da fonte
         </span>
@@ -278,7 +278,7 @@ export function PrayerScreen({
 
       {/* ── Navigation (fixed) ── */}
       <div className="fixed bottom-12 left-0 right-0 px-4">
-        <div className="flex justify-center gap-2 max-w-[560px] mx-auto">
+        <div className="flex justify-center gap-2 max-w-[560px] md:max-w-2xl lg:max-w-3xl mx-auto">
           <button
             onClick={handlePrev}
             aria-label={canReturnToPreviousStep ? 'Etapa anterior' : 'Voltar à tela inicial'}

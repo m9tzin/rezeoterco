@@ -10,7 +10,7 @@ export function VerseOfDay({ date }: Props) {
   return (
     <section
       aria-labelledby="versiculo-do-dia"
-      className="w-full max-w-lg mb-7 border border-gold/30 rounded-sm px-5 py-5 bg-white/80 shadow-[0_1px_10px_rgba(92,61,46,0.06)] text-left"
+      className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl mb-7 border border-gold/30 rounded-sm px-5 py-5 bg-white/80 shadow-[0_1px_10px_rgba(92,61,46,0.06)] text-left"
     >
       <p
         id="versiculo-do-dia"

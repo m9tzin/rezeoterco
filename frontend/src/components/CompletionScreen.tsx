@@ -38,14 +38,14 @@ export function CompletionScreen({ onRestart }: Props) {
       </p>
 
       {/* Quote card */}
-      <div className="max-w-sm w-full border border-parchment rounded-sm px-6 py-6 bg-white shadow-[0_2px_16px_rgba(92,61,46,0.07)] mb-10">
+      <div className="max-w-sm md:max-w-xl lg:max-w-2xl w-full border border-parchment rounded-sm px-6 py-6 bg-white shadow-[0_2px_16px_rgba(92,61,46,0.07)] mb-10">
         <span className="font-cormorant text-4xl text-gold/40 leading-none block mb-2" aria-hidden="true">&ldquo;</span>
         <p className="font-garamond italic text-terco-muted text-lg leading-relaxed">
           Rezar o terço é pegar na mão de Maria e ir com ela ao encontro de Jesus.
         </p>
       </div>
 
-      <div className="flex flex-col gap-3 w-full max-w-sm">
+      <div className="flex flex-col gap-3 w-full max-w-sm md:max-w-xl lg:max-w-2xl">
         <button
           onClick={onRestart}
           className="font-cormorant text-base tracking-widest uppercase px-10 min-h-[52px] bg-brown text-cream hover:bg-brown-dark transition-colors rounded-sm active:scale-[0.97] shadow-[0_2px_12px_rgba(92,61,46,0.2)]"
