@@ -4,9 +4,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 const NATURAL_RATE = 0.9
 const NATURAL_PITCH = 1
+const SPEAK_AFTER_CANCEL_DELAY_MS = 75
 
 const QUALITY_NAME_PATTERN =
-  /\b(neural|natural|premium|enhanced|luciana|francisca|maria|felipe|daniel|helena|joana|ines|inês|raquel)\b/i
+  /\b(google|neural|natural|premium|enhanced|luciana|francisca|maria|felipe|daniel|helena|joana|ines|inês|raquel)\b/i
 const ROBOTIC_NAME_PATTERN = /\b(default|generic|compact|standard|basic|robot|synthetic|espeak|festival)\b/i
 
 function normalizeLang(lang: string): string {
@@ -24,9 +25,9 @@ function voiceScore(voice: SpeechSynthesisVoice): number {
   else if (lang === 'pt') score += 600
   else return -1
 
-  if (voice.localService) score += 100
   if (QUALITY_NAME_PATTERN.test(name)) score += 60
   if (ROBOTIC_NAME_PATTERN.test(name)) score -= 80
+  if (voice.localService) score += 5
 
   return score
 }
@@ -49,6 +50,7 @@ export function useSpeechSynthesis(text: string, options: SpeechSynthesisOptions
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
+  const queuedSpeakRef = useRef<number | null>(null)
   const onEndRef = useRef(options.onEnd)
 
   useEffect(() => {
@@ -82,13 +84,21 @@ export function useSpeechSynthesis(text: string, options: SpeechSynthesisOptions
     onEndRef.current = options.onEnd
   }, [options.onEnd])
 
+  const clearQueuedSpeak = useCallback(() => {
+    if (queuedSpeakRef.current === null || typeof window === 'undefined') return
+
+    window.clearTimeout(queuedSpeakRef.current)
+    queuedSpeakRef.current = null
+  }, [])
+
   const stop = useCallback(() => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
 
+    clearQueuedSpeak()
     utteranceRef.current = null
     window.speechSynthesis.cancel()
     setIsSpeaking(false)
-  }, [])
+  }, [clearQueuedSpeak])
 
   const speak = useCallback(() => {
     if (
@@ -99,6 +109,7 @@ export function useSpeechSynthesis(text: string, options: SpeechSynthesisOptions
       return
     }
 
+    clearQueuedSpeak()
     utteranceRef.current = null
     window.speechSynthesis.cancel()
 
@@ -125,8 +136,13 @@ export function useSpeechSynthesis(text: string, options: SpeechSynthesisOptions
 
     utteranceRef.current = utterance
     setIsSpeaking(true)
-    window.speechSynthesis.speak(utterance)
-  }, [text, voices])
+    queuedSpeakRef.current = window.setTimeout(() => {
+      queuedSpeakRef.current = null
+      if (utteranceRef.current !== utterance) return
+
+      window.speechSynthesis.speak(utterance)
+    }, SPEAK_AFTER_CANCEL_DELAY_MS)
+  }, [clearQueuedSpeak, text, voices])
 
   const toggle = useCallback(() => {
     if (isSpeaking) {
@@ -143,12 +159,13 @@ export function useSpeechSynthesis(text: string, options: SpeechSynthesisOptions
 
   useEffect(
     () => () => {
+      clearQueuedSpeak()
       if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
 
       window.speechSynthesis.cancel()
       utteranceRef.current = null
     },
-    []
+    [clearQueuedSpeak]
   )
 
   return { isSupported, isSpeaking, speak, stop, toggle }
