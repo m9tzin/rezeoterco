@@ -99,6 +99,7 @@ describe('RosaryProgress', () => {
       'preserveAspectRatio',
       'none'
     )
+    expect(screen.getByTestId('progress-terco-guide-loop')).toBeInTheDocument()
     expect(screen.queryByTestId('progress-linear-layout')).not.toBeInTheDocument()
     expect(screen.getByTestId('progress-bead-0')).toHaveAttribute('data-current', 'true')
     expect(screen.getByTestId('progress-bead-0')).toHaveAttribute('data-tone', 'intro')

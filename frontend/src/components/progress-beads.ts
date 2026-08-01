@@ -35,8 +35,19 @@ export function beadTone(etapa: Etapa): BeadTone {
   return 'minor'
 }
 
-export function beadClass(tone: BeadTone, state: BeadState): string {
-  const size = tone === 'major' || tone === 'final' ? 'h-3.5 w-3.5' : 'h-2.5 w-2.5'
+export function beadClass(
+  tone: BeadTone,
+  state: BeadState,
+  density: 'default' | 'compact' = 'default'
+): string {
+  const size =
+    tone === 'major' || tone === 'final'
+      ? density === 'compact'
+        ? 'h-3 w-3'
+        : 'h-3.5 w-3.5'
+      : density === 'compact'
+        ? 'h-2 w-2'
+        : 'h-2.5 w-2.5'
 
   if (state === 'current') {
     return `${size} bg-red-800 border-red-800 shadow-[0_0_0_5px_rgba(139,32,32,0.16)] scale-125`
