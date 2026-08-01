@@ -96,7 +96,7 @@ export function WelcomeScreen({
           ].map(([number, title, text]) => (
             <div
               key={number}
-              className="relative overflow-hidden border border-parchment bg-white rounded-sm px-5 py-5 shadow-[0_1px_8px_rgba(92,61,46,0.06)]"
+              className="relative overflow-hidden border border-parchment bg-white rounded-sm px-5 py-5 shadow-[0_1px_8px_rgba(92,61,46,0.06)] transition-all duration-200 motion-safe:ease-out [@media(hover:hover)]:hover:-translate-y-1 [@media(hover:hover)]:hover:border-gold/40 [@media(hover:hover)]:hover:shadow-[0_6px_18px_rgba(92,61,46,0.1)]"
             >
               <div className="absolute inset-x-0 top-0 h-1 bg-gold/50" aria-hidden="true" />
               <div className="mb-4 flex items-center gap-3">

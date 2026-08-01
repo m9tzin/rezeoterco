@@ -110,8 +110,15 @@ export function SelectionScreen({
           <button
             type="button"
             onClick={onShowWelcome}
-            className="font-cormorant text-base text-terco-muted hover:text-brown transition-colors min-h-[44px] px-3"
+            aria-label="Como rezar"
+            className="inline-flex items-center gap-2 font-cormorant text-base text-terco-muted hover:text-brown transition-colors min-h-[44px] px-3"
           >
+            <span
+              className="flex h-5 w-5 items-center justify-center rounded-full border border-gold/50 bg-white/60 font-cormorant text-sm text-gold"
+              aria-hidden="true"
+            >
+              ?
+            </span>
             Como rezar
           </button>
         </div>
@@ -224,10 +231,10 @@ export function SelectionScreen({
                 }
                 setActiveTipo(terco.id)
               }}
-              className={`font-cormorant px-5 min-h-[44px] rounded-sm text-base border transition-colors active:scale-[0.97] ${
+              className={`font-cormorant px-5 min-h-[44px] rounded-sm text-base border transition-all duration-200 motion-safe:ease-out active:scale-[0.97] [@media(hover:hover)]:hover:-translate-y-0.5 ${
                 activeTipo === terco.id
-                  ? 'bg-brown text-cream border-brown shadow-[0_2px_8px_rgba(92,61,46,0.18)]'
-                  : 'bg-white text-terco-muted border-parchment hover:border-gold hover:text-brown'
+                  ? 'bg-brown text-cream border-brown shadow-[0_2px_8px_rgba(92,61,46,0.18)] [@media(hover:hover)]:hover:shadow-[0_4px_12px_rgba(92,61,46,0.2)]'
+                  : 'bg-white text-terco-muted border-parchment hover:border-gold hover:text-brown [@media(hover:hover)]:hover:shadow-[0_3px_10px_rgba(92,61,46,0.1)]'
               }`}
             >
               {terco.nome}
@@ -261,7 +268,7 @@ export function SelectionScreen({
                 <button
                   key={misterio.id}
                   onClick={() => onSelectMisterio(activeTipo, misterio.id)}
-                  className={`w-full text-left flex items-center gap-4 px-5 py-4 border bg-white hover:bg-[#faf8f3] transition-all duration-200 rounded-sm active:scale-[0.99] group shadow-[0_1px_4px_rgba(92,61,46,0.05)] hover:shadow-[0_3px_12px_rgba(92,61,46,0.1)] ${
+                  className={`w-full text-left flex items-center gap-4 px-5 py-4 border bg-white hover:bg-[#faf8f3] transition-all duration-200 motion-safe:ease-out rounded-sm active:scale-[0.99] group shadow-[0_1px_4px_rgba(92,61,46,0.05)] [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_5px_16px_rgba(92,61,46,0.12)] ${
                     isToday ? 'border-[1.5px]' : 'border-parchment'
                   }`}
                   style={isToday ? { borderColor: vis?.cor } : undefined}

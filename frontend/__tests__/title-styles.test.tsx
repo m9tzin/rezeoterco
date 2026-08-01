@@ -36,6 +36,10 @@ describe('title typography', () => {
       'font-semibold',
       'text-2xl'
     )
+
+    expect(within(screen.getByRole('button', { name: 'Como rezar' })).getByText('?')).toHaveClass(
+      'text-gold'
+    )
   })
 
   it('uses larger semibold title styles while praying', () => {
