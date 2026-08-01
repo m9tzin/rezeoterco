@@ -69,7 +69,7 @@ export function RosaryProgress({ misterio, tipo, currentIndex }: Props) {
 
   return (
     <section
-      className="w-full max-w-[560px] mb-5"
+      className="w-full max-w-[560px] md:max-w-2xl lg:max-w-3xl mb-5"
       aria-label={`Figura do progresso: ${describeTipo(tipo)}`}
     >
       <div
