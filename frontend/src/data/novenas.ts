@@ -1,4 +1,5 @@
 import type { Etapa, TercoData } from './types'
+import { AVE_MARIA, GLORIA, PAI_NOSSO } from './mariano'
 
 type NovenaDia = {
   tema: string
@@ -65,11 +66,16 @@ const NOVENAS: Array<{
 ]
 
 function gerarDias(invocacao: string, dias: NovenaDia[]): Etapa[] {
-  return dias.map((dia, index) => ({
-    tipo: 'novena-dia',
-    label: `Dia ${index + 1}/9 — ${dia.tema}`,
-    texto: `${invocacao}\n\n${dia.intencao}\n\nPai Nosso, Ave Maria e Glória ao Pai.\n\nAmém.`,
-  }))
+  return dias.flatMap((dia, index) => [
+    {
+      tipo: 'novena-dia',
+      label: `Dia ${index + 1}/9 — ${dia.tema}`,
+      texto: `${invocacao}\n\n${dia.intencao}\n\nAmém.`,
+    },
+    { tipo: 'pai-nosso', label: 'Pai Nosso', texto: PAI_NOSSO },
+    { tipo: 'ave-maria', label: 'Ave Maria', texto: AVE_MARIA },
+    { tipo: 'gloria', label: 'Glória', texto: GLORIA },
+  ])
 }
 
 export const novenaData: TercoData = {
