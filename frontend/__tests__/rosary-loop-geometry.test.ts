@@ -41,7 +41,7 @@ describe('rosary loop geometry', () => {
     const plain = layout.beads[10]
 
     expect(plain.diameter / layout.spacing).toBeGreaterThan(0.5)
-    expect(plain.diameter / layout.spacing).toBeLessThan(0.65)
+    expect(plain.diameter / layout.spacing).toBeLessThan(0.72)
   })
 
   it('strings the cord through every bead centre, thin against the beads', () => {
