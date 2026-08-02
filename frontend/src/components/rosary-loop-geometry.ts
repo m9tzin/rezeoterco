@@ -103,7 +103,7 @@ export function pendantCount(total: number): number {
  * Bead diameter as a fraction of the bead-to-bead pitch. The beads stand clearly
  * apart, with the cord showing through between them.
  */
-const MINOR_FILL = 0.64
+const MINOR_FILL = 0.7
 /** Extra bulk for the bead that sits where the two flanks converge. */
 const MEDAL_SCALE = 2.25
 /** Cord thickness, relative to a plain bead, with a floor so it stays visible. */
@@ -122,7 +122,7 @@ const CROSS_ASPECT = 1.5
 const CROSS_BAR_RATIO = 0.245
 const CROSS_ARM_RATIO = 0.29
 const CROSS_MIN_WIDTH = 14
-const CROSS_MAX_WIDTH = 22
+const CROSS_MAX_WIDTH = 26
 const BOTTOM_MARGIN = 3
 
 function clamp(value: number, low: number, high: number): number {
