@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { RosaryLogo } from './RosaryLogo'
 
 type Props = {
   hasSavedProgress: boolean
@@ -104,53 +105,15 @@ export function WelcomeScreen({
           <button
             type="button"
             onClick={onStart}
-            className="font-cormorant text-base text-terco-muted hover:text-brown transition-colors min-h-[44px] px-3"
+            className="font-cormorant text-base text-terco-muted hover:text-brown transition-colors min-h-[44px] px-3 inline-flex items-center gap-2"
           >
+            <RosaryLogo width={13} className="shrink-0 opacity-80" />
             Menu
           </button>
         </div>
 
         <div className="text-center">
-          {/* Rosary hanging from its loop: tilted ring of beads, medal at the
-              base, short pendant down to the cross. */}
-          <svg
-            width="36"
-            height="61"
-            viewBox="7.8 3.8 31.01 52.16"
-            className="text-gold mx-auto mb-6"
-            data-testid="welcome-logo"
-            aria-hidden="true"
-          >
-            <g
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="0.75"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-            >
-              <polygon points="20.56,28.55 14.53,27.09 10.45,22.44 10.52,16.27 14.00,11.05 19.28,7.68 25.40,6.45 31.47,7.91 35.55,12.56 35.48,18.73 32.00,23.95 26.72,27.32" />
-              <polyline points="20.56,28.55 20.56,32.45 20.56,36.35 20.56,40.25 20.56,43.35" />
-            </g>
-            <g fill="currentColor">
-              <circle cx="20.56" cy="28.55" r="2.8" />
-              <circle cx="14.53" cy="27.09" r="1.45" />
-              <circle cx="10.45" cy="22.44" r="1.45" />
-              <circle cx="10.52" cy="16.27" r="1.45" />
-              <circle cx="14.00" cy="11.05" r="2.05" />
-              <circle cx="19.28" cy="7.68" r="1.45" />
-              <circle cx="25.40" cy="6.45" r="1.45" />
-              <circle cx="31.47" cy="7.91" r="1.45" />
-              <circle cx="35.55" cy="12.56" r="2.05" />
-              <circle cx="35.48" cy="18.73" r="1.45" />
-              <circle cx="32.00" cy="23.95" r="1.45" />
-              <circle cx="26.72" cy="27.32" r="1.45" />
-              <circle cx="20.56" cy="32.45" r="1.2" />
-              <circle cx="20.56" cy="36.35" r="1.2" />
-              <circle cx="20.56" cy="40.25" r="1.7" />
-              <rect x="19.46" y="43.35" width="2.2" height="11.4" rx="0.5" />
-              <rect x="16.56" y="46.75" width="8" height="2.2" rx="0.5" />
-            </g>
-          </svg>
+          <RosaryLogo width={40} className="text-brown mx-auto mb-6" />
 
           <TypewriterTitle />
           <p className="font-garamond italic text-terco-muted text-lg leading-relaxed max-w-xl mx-auto">

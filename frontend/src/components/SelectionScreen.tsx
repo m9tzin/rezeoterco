@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import type { TipoTerco, Progress, ProgressLayout } from '@/data/types'
 import { TERCOS, TERCO_LIST } from '@/data/index'
 import { VerseOfDay } from './VerseOfDay'
+import { RosaryLogo } from './RosaryLogo'
 
 type Props = {
   savedProgress: Progress | null
@@ -123,20 +124,7 @@ export function SelectionScreen({
           </button>
         </div>
 
-        <svg
-          width="26"
-          height="42"
-          viewBox="0 0 28 44"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          className="text-gold mx-auto mb-6"
-          aria-hidden="true"
-        >
-          <line x1="14" y1="1" x2="14" y2="43" />
-          <line x1="2" y1="13" x2="26" y2="13" />
-        </svg>
+        <RosaryLogo width={40} className="text-brown mx-auto mb-6" />
 
         <div className="flex items-center justify-center gap-2 mb-3">
           <h1 className="font-cormorant font-semibold text-[2.75rem] leading-tight text-brown tracking-widest uppercase">

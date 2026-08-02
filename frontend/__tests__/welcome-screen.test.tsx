@@ -103,17 +103,24 @@ describe('WelcomeScreen', () => {
       expect(screen.queryByTestId('welcome-title-caret')).not.toBeInTheDocument()
     })
 
-    it('shows the rosary logo instead of the old plain cross', () => {
+    it('marks the screen with the rosary figure, in the header and beside the menu', () => {
       mockReducedMotion(true)
 
       render(<WelcomeScreen hasSavedProgress={false} onStart={jest.fn()} onResume={jest.fn()} />)
 
-      const logo = screen.getByTestId('welcome-logo')
+      const logos = screen.getAllByTestId('rosary-logo')
 
-      expect(logo.querySelectorAll('circle').length).toBeGreaterThan(10)
-      expect(logo.querySelectorAll('rect')).toHaveLength(2)
-      expect(logo.querySelectorAll('line')).toHaveLength(0)
-      expect(logo).toHaveAttribute('aria-hidden', 'true')
+      expect(logos).toHaveLength(2)
+      logos.forEach((logo) => {
+        expect(logo.querySelectorAll('circle').length).toBeGreaterThan(8)
+        expect(logo.querySelectorAll('rect')).toHaveLength(2)
+        expect(logo.querySelectorAll('line')).toHaveLength(0)
+        expect(logo).toHaveAttribute('aria-hidden', 'true')
+      })
+
+      // The menu mark is the discreet one; the header carries the full logo.
+      const widths = logos.map((logo) => Number(logo.getAttribute('width')))
+      expect(Math.min(...widths)).toBeLessThan(Math.max(...widths))
     })
   })
 })
