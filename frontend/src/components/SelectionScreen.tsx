@@ -161,10 +161,10 @@ export function SelectionScreen({
               type="button"
               onClick={() => onProgressLayoutChange(layout)}
               aria-pressed={progressLayout === layout}
-              className={`min-h-[40px] px-4 rounded-sm font-cormorant text-base transition-colors ${
+              className={`min-h-[40px] px-4 rounded-sm font-cormorant text-base transition-all duration-200 motion-safe:ease-out active:scale-[0.97] [@media(hover:hover)]:hover:-translate-y-0.5 ${
                 progressLayout === layout
-                  ? 'bg-brown text-cream shadow-[0_1px_4px_rgba(92,61,46,0.16)]'
-                  : 'text-terco-muted hover:text-brown'
+                  ? 'bg-brown text-cream shadow-[0_1px_4px_rgba(92,61,46,0.16)] [@media(hover:hover)]:hover:shadow-[0_3px_10px_rgba(92,61,46,0.18)]'
+                  : 'text-terco-muted [@media(hover:hover)]:hover:text-brown [@media(hover:hover)]:hover:shadow-[0_3px_10px_rgba(92,61,46,0.1)]'
               }`}
             >
               {label}
@@ -188,13 +188,13 @@ export function SelectionScreen({
           <div className="flex gap-2">
             <button
               onClick={onResume}
-              className="font-cormorant text-base tracking-wide flex-1 min-h-[44px] bg-brown text-cream rounded-sm hover:bg-brown-dark transition-colors active:scale-[0.97]"
+              className="font-cormorant text-base tracking-wide flex-1 min-h-[44px] bg-brown text-cream rounded-sm transition-all duration-200 motion-safe:ease-out active:scale-[0.97] [@media(hover:hover)]:hover:bg-brown-dark [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_4px_12px_rgba(92,61,46,0.2)]"
             >
               Continuar
             </button>
             <button
               onClick={onDismissProgress}
-              className="font-cormorant text-base tracking-wide flex-1 min-h-[44px] border border-gold/60 text-brown rounded-sm hover:bg-parchment transition-colors active:scale-[0.97]"
+              className="font-cormorant text-base tracking-wide flex-1 min-h-[44px] border border-gold/60 text-brown rounded-sm transition-all duration-200 motion-safe:ease-out active:scale-[0.97] [@media(hover:hover)]:hover:bg-parchment [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_3px_10px_rgba(92,61,46,0.1)]"
             >
               Começar do zero
             </button>
