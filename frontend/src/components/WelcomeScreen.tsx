@@ -1,5 +1,8 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { RosaryLogo } from './RosaryLogo'
+
 type Props = {
   hasSavedProgress: boolean
   onStart: () => void
@@ -9,10 +12,82 @@ type Props = {
 
 const DEMO_VIDEO_URL = process.env.NEXT_PUBLIC_DEMO_VIDEO_URL ?? ''
 
+const TITLE = 'Reze o Terço'
+const TYPE_MS = 130
+const DELETE_MS = 55
+const HOLD_FULL_MS = 2400
+const HOLD_EMPTY_MS = 700
+
 function normalizeVideoUrl(url: string): string {
   if (!url.includes('loom.com/share/')) return url
 
   return url.replace('loom.com/share/', 'loom.com/embed/').split('?')[0]
+}
+
+/**
+ * Types the title out, holds it, erases it and starts over.
+ *
+ * The heading renders complete on the server and on first paint, and only starts
+ * cycling once mounted — so there is no flash of empty heading, and readers that
+ * never run the effect still see the whole title. The accessible name is pinned
+ * with `aria-label`, so assistive tech announces the full title at any point in
+ * the cycle rather than whatever fragment is on screen.
+ */
+function TypewriterTitle() {
+  const [animated, setAnimated] = useState(false)
+  const [count, setCount] = useState(TITLE.length)
+  const [erasing, setErasing] = useState(false)
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return
+
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const sync = () => setAnimated(!query.matches)
+
+    sync()
+    query.addEventListener('change', sync)
+    return () => query.removeEventListener('change', sync)
+  }, [])
+
+  useEffect(() => {
+    if (!animated) {
+      setCount(TITLE.length)
+      setErasing(false)
+      return
+    }
+
+    const done = erasing ? count === 0 : count === TITLE.length
+    const delay = done
+      ? erasing
+        ? HOLD_EMPTY_MS
+        : HOLD_FULL_MS
+      : erasing
+        ? DELETE_MS
+        : TYPE_MS
+
+    const timer = setTimeout(() => {
+      if (done) setErasing(!erasing)
+      else setCount(erasing ? count - 1 : count + 1)
+    }, delay)
+
+    return () => clearTimeout(timer)
+  }, [animated, count, erasing])
+
+  return (
+    <h1
+      aria-label={TITLE}
+      className="font-cormorant font-semibold text-[2.75rem] leading-tight text-brown tracking-widest uppercase mb-3"
+    >
+      <span aria-hidden="true">{TITLE.slice(0, count)}</span>
+      {animated && (
+        <span
+          aria-hidden="true"
+          data-testid="welcome-title-caret"
+          className="ml-1 inline-block h-[0.8em] w-[3px] translate-y-[0.06em] bg-gold/70 animate-pulse"
+        />
+      )}
+    </h1>
+  )
 }
 
 export function WelcomeScreen({
@@ -30,31 +105,17 @@ export function WelcomeScreen({
           <button
             type="button"
             onClick={onStart}
-            className="font-cormorant text-base text-terco-muted hover:text-brown transition-colors min-h-[44px] px-3"
+            className="font-cormorant text-base text-terco-muted hover:text-brown transition-colors min-h-[44px] px-3 inline-flex items-center gap-2"
           >
+            <RosaryLogo width={13} className="shrink-0 opacity-80" />
             Menu
           </button>
         </div>
 
         <div className="text-center">
-          <svg
-            width="28"
-            height="44"
-            viewBox="0 0 28 44"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            className="text-gold mx-auto mb-6"
-            aria-hidden="true"
-          >
-            <line x1="14" y1="1" x2="14" y2="43" />
-            <line x1="2" y1="13" x2="26" y2="13" />
-          </svg>
+          <RosaryLogo width={40} className="text-brown mx-auto mb-6" />
 
-          <h1 className="font-cormorant font-semibold text-[2.75rem] leading-tight text-brown tracking-widest uppercase mb-3">
-            Reze o Terço
-          </h1>
+          <TypewriterTitle />
           <p className="font-garamond italic text-terco-muted text-lg leading-relaxed max-w-xl mx-auto">
             Um guia simples para acompanhar cada oração, mistério e conta com calma.
           </p>
@@ -96,7 +157,7 @@ export function WelcomeScreen({
           ].map(([number, title, text]) => (
             <div
               key={number}
-              className="relative overflow-hidden border border-parchment bg-white rounded-sm px-5 py-5 shadow-[0_1px_8px_rgba(92,61,46,0.06)]"
+              className="relative overflow-hidden border border-parchment bg-white rounded-sm px-5 py-5 shadow-[0_1px_8px_rgba(92,61,46,0.06)] transition-all duration-200 motion-safe:ease-out [@media(hover:hover)]:hover:-translate-y-1 [@media(hover:hover)]:hover:border-gold/40 [@media(hover:hover)]:hover:shadow-[0_6px_18px_rgba(92,61,46,0.1)]"
             >
               <div className="absolute inset-x-0 top-0 h-1 bg-gold/50" aria-hidden="true" />
               <div className="mb-4 flex items-center gap-3">

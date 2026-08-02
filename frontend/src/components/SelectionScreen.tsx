@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import type { TipoTerco, Progress, ProgressLayout } from '@/data/types'
 import { TERCOS, TERCO_LIST } from '@/data/index'
 import { VerseOfDay } from './VerseOfDay'
+import { RosaryLogo } from './RosaryLogo'
 
 type Props = {
   savedProgress: Progress | null
@@ -110,26 +111,20 @@ export function SelectionScreen({
           <button
             type="button"
             onClick={onShowWelcome}
-            className="font-cormorant text-base text-terco-muted hover:text-brown transition-colors min-h-[44px] px-3"
+            aria-label="Como rezar"
+            className="inline-flex items-center gap-2 font-cormorant text-base text-terco-muted hover:text-brown transition-colors min-h-[44px] px-3"
           >
+            <span
+              className="flex h-5 w-5 items-center justify-center rounded-full border border-gold/50 bg-white/60 font-cormorant text-sm text-gold"
+              aria-hidden="true"
+            >
+              ?
+            </span>
             Como rezar
           </button>
         </div>
 
-        <svg
-          width="26"
-          height="42"
-          viewBox="0 0 28 44"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          className="text-gold mx-auto mb-6"
-          aria-hidden="true"
-        >
-          <line x1="14" y1="1" x2="14" y2="43" />
-          <line x1="2" y1="13" x2="26" y2="13" />
-        </svg>
+        <RosaryLogo width={40} className="text-brown mx-auto mb-6" />
 
         <div className="flex items-center justify-center gap-2 mb-3">
           <h1 className="font-cormorant font-semibold text-[2.75rem] leading-tight text-brown tracking-widest uppercase">
@@ -166,10 +161,10 @@ export function SelectionScreen({
               type="button"
               onClick={() => onProgressLayoutChange(layout)}
               aria-pressed={progressLayout === layout}
-              className={`min-h-[40px] px-4 rounded-sm font-cormorant text-base transition-colors ${
+              className={`min-h-[40px] px-4 rounded-sm font-cormorant text-base transition-all duration-200 motion-safe:ease-out active:scale-[0.97] [@media(hover:hover)]:hover:-translate-y-0.5 ${
                 progressLayout === layout
-                  ? 'bg-brown text-cream shadow-[0_1px_4px_rgba(92,61,46,0.16)]'
-                  : 'text-terco-muted hover:text-brown'
+                  ? 'bg-brown text-cream shadow-[0_1px_4px_rgba(92,61,46,0.16)] [@media(hover:hover)]:hover:shadow-[0_3px_10px_rgba(92,61,46,0.18)]'
+                  : 'text-terco-muted [@media(hover:hover)]:hover:text-brown [@media(hover:hover)]:hover:shadow-[0_3px_10px_rgba(92,61,46,0.1)]'
               }`}
             >
               {label}
@@ -193,13 +188,13 @@ export function SelectionScreen({
           <div className="flex gap-2">
             <button
               onClick={onResume}
-              className="font-cormorant text-base tracking-wide flex-1 min-h-[44px] bg-brown text-cream rounded-sm hover:bg-brown-dark transition-colors active:scale-[0.97]"
+              className="font-cormorant text-base tracking-wide flex-1 min-h-[44px] bg-brown text-cream rounded-sm transition-all duration-200 motion-safe:ease-out active:scale-[0.97] [@media(hover:hover)]:hover:bg-brown-dark [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_4px_12px_rgba(92,61,46,0.2)]"
             >
               Continuar
             </button>
             <button
               onClick={onDismissProgress}
-              className="font-cormorant text-base tracking-wide flex-1 min-h-[44px] border border-gold/60 text-brown rounded-sm hover:bg-parchment transition-colors active:scale-[0.97]"
+              className="font-cormorant text-base tracking-wide flex-1 min-h-[44px] border border-gold/60 text-brown rounded-sm transition-all duration-200 motion-safe:ease-out active:scale-[0.97] [@media(hover:hover)]:hover:bg-parchment [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_3px_10px_rgba(92,61,46,0.1)]"
             >
               Começar do zero
             </button>
@@ -224,10 +219,10 @@ export function SelectionScreen({
                 }
                 setActiveTipo(terco.id)
               }}
-              className={`font-cormorant px-5 min-h-[44px] rounded-sm text-base border transition-colors active:scale-[0.97] ${
+              className={`font-cormorant px-5 min-h-[44px] rounded-sm text-base border transition-all duration-200 motion-safe:ease-out active:scale-[0.97] [@media(hover:hover)]:hover:-translate-y-0.5 ${
                 activeTipo === terco.id
-                  ? 'bg-brown text-cream border-brown shadow-[0_2px_8px_rgba(92,61,46,0.18)]'
-                  : 'bg-white text-terco-muted border-parchment hover:border-gold hover:text-brown'
+                  ? 'bg-brown text-cream border-brown shadow-[0_2px_8px_rgba(92,61,46,0.18)] [@media(hover:hover)]:hover:shadow-[0_4px_12px_rgba(92,61,46,0.2)]'
+                  : 'bg-white text-terco-muted border-parchment hover:border-gold hover:text-brown [@media(hover:hover)]:hover:shadow-[0_3px_10px_rgba(92,61,46,0.1)]'
               }`}
             >
               {terco.nome}
@@ -261,7 +256,7 @@ export function SelectionScreen({
                 <button
                   key={misterio.id}
                   onClick={() => onSelectMisterio(activeTipo, misterio.id)}
-                  className={`w-full text-left flex items-center gap-4 px-5 py-4 border bg-white hover:bg-[#faf8f3] transition-all duration-200 rounded-sm active:scale-[0.99] group shadow-[0_1px_4px_rgba(92,61,46,0.05)] hover:shadow-[0_3px_12px_rgba(92,61,46,0.1)] ${
+                  className={`w-full text-left flex items-center gap-4 px-5 py-4 border bg-white hover:bg-[#faf8f3] transition-all duration-200 motion-safe:ease-out rounded-sm active:scale-[0.99] group shadow-[0_1px_4px_rgba(92,61,46,0.05)] [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_5px_16px_rgba(92,61,46,0.12)] ${
                     isToday ? 'border-[1.5px]' : 'border-parchment'
                   }`}
                   style={isToday ? { borderColor: vis?.cor } : undefined}
