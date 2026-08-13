@@ -115,15 +115,10 @@ export function SelectionScreen({
 
         <RosaryLogo width={40} className="text-brown mx-auto mb-6" />
 
-        <div className="flex items-center justify-center gap-2 mb-3">
-          <TypewriterTitle
-            caretTestId="selection-title-caret"
-            className="font-cormorant font-semibold text-[2.75rem] leading-tight text-brown tracking-widest uppercase"
-          />
-          <span className="font-geist text-[10px] text-terco-muted/60 border border-terco-muted/25 rounded px-1.5 py-0.5 tracking-widest uppercase self-start mt-3">
-            beta
-          </span>
-        </div>
+        <TypewriterTitle
+          caretTestId="selection-title-caret"
+          className="font-cormorant font-semibold text-[2.75rem] leading-tight text-brown tracking-widest uppercase mb-3"
+        />
         <p className="font-garamond italic text-terco-muted text-lg leading-relaxed max-w-[18rem] md:max-w-xl mx-auto">
           Guia passo a passo para rezar o terço com calma e devoção.
         </p>
