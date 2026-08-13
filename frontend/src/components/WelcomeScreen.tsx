@@ -14,12 +14,6 @@ type Props = {
 
 const DEMO_VIDEO_URL = process.env.NEXT_PUBLIC_DEMO_VIDEO_URL ?? ''
 
-function normalizeVideoUrl(url: string): string {
-  if (!url.includes('loom.com/share/')) return url
-
-  return url.replace('loom.com/share/', 'loom.com/embed/').split('?')[0]
-}
-
 export function WelcomeScreen({
   hasSavedProgress,
   onStart,
@@ -27,7 +21,7 @@ export function WelcomeScreen({
   onShowWelcome = () => {},
   demoVideoUrl = DEMO_VIDEO_URL,
 }: Props) {
-  const videoUrl = normalizeVideoUrl(demoVideoUrl.trim())
+  const videoUrl = demoVideoUrl.trim()
 
   return (
     <div className="bg-cream flex flex-col items-center px-4 pb-10">
@@ -50,10 +44,15 @@ export function WelcomeScreen({
       <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl mb-8">
         {videoUrl ? (
           <div className="aspect-video w-full overflow-hidden rounded-sm border border-parchment bg-white shadow-[0_2px_16px_rgba(92,61,46,0.07)]">
-            <iframe
+            <video
               src={videoUrl}
-              title="Vídeo demonstrativo: como rezar o terço"
-              allowFullScreen
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-hidden="true"
+              data-testid="demo-video"
               className="h-full w-full"
             />
           </div>

@@ -6,23 +6,26 @@ describe('WelcomeScreen', () => {
     render(<WelcomeScreen hasSavedProgress={false} onStart={jest.fn()} onResume={jest.fn()} />)
 
     expect(screen.getByText('Vídeo demonstrativo em breve')).toBeInTheDocument()
-    expect(screen.queryByTitle('Vídeo demonstrativo: como rezar o terço')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('demo-video')).not.toBeInTheDocument()
   })
 
-  it('renders a configured Loom share URL as an embeddable player', () => {
+  it('renders a configured video URL as an autoplaying, muted, looping loop', () => {
     render(
       <WelcomeScreen
         hasSavedProgress={false}
         onStart={jest.fn()}
         onResume={jest.fn()}
-        demoVideoUrl="https://www.loom.com/share/demo-id?sid=abc"
+        demoVideoUrl="https://example.public.blob.vercel-storage.com/demo.mp4"
       />
     )
 
-    expect(screen.getByTitle('Vídeo demonstrativo: como rezar o terço')).toHaveAttribute(
-      'src',
-      'https://www.loom.com/embed/demo-id'
-    )
+    const video = screen.getByTestId('demo-video')
+    expect(video.tagName).toBe('VIDEO')
+    expect(video).toHaveAttribute('src', 'https://example.public.blob.vercel-storage.com/demo.mp4')
+    expect(video).toHaveAttribute('autoplay')
+    expect((video as HTMLVideoElement).muted).toBe(true)
+    expect(video).toHaveAttribute('loop')
+    expect(video).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('calls the start action from the primary CTA', () => {
