@@ -14,24 +14,21 @@ afterEach(() => {
 })
 
 async function goToSelection() {
-  fireEvent.click(await screen.findByRole('button', { name: 'Vamos rezar o terço?' }))
   expect(await screen.findByText('Versículo do dia')).toBeInTheDocument()
 }
 
 describe('Home prayer flow', () => {
-  it('shows the welcome screen before selection and navigates to devotional choices', async () => {
+  it('shows devotional choices as the initial screen', async () => {
     render(<Home />)
 
-    expect(await screen.findByText('Como rezar em poucos passos')).toBeInTheDocument()
-    expect(screen.getByText('Vídeo demonstrativo em breve')).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Vamos rezar o terço?' }))
-
     expect(await screen.findByText('Versículo do dia')).toBeInTheDocument()
+    expect(screen.getByText('Tipo de devoção')).toBeInTheDocument()
+    expect(screen.queryByText('Como rezar em poucos passos')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Menu' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Como rezar' })).toBeInTheDocument()
   })
 
-  it('reopens the welcome screen from the selection screen', async () => {
+  it('opens the tutorial from home and returns to home through the navbar', async () => {
     render(<Home />)
 
     await goToSelection()
@@ -39,9 +36,13 @@ describe('Home prayer flow', () => {
 
     expect(screen.getByText('Como rezar em poucos passos')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Vamos rezar o terço?' })).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Menu' }))
+
+    expect(screen.getByText('Versículo do dia')).toBeInTheDocument()
   })
 
-  it('lets returning users continue saved progress from the welcome screen', async () => {
+  it('lets returning users continue saved progress from home', async () => {
     localStorage.setItem(
       'terco-progress',
       JSON.stringify({ tipo: 'mariano', misterioId: 'gozosos', etapaIndex: 1 })
@@ -49,7 +50,7 @@ describe('Home prayer flow', () => {
 
     render(<Home />)
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Continuar oração salva' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Continuar' }))
 
     expect(screen.getByText('Pai Nosso')).toBeInTheDocument()
     expect(screen.getByText('Mistérios Gozosos')).toBeInTheDocument()

@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { act, render, screen, within } from '@testing-library/react'
 import { CompletionScreen } from '@/components/CompletionScreen'
 import { PrayerScreen } from '@/components/PrayerScreen'
 import { SelectionScreen } from '@/components/SelectionScreen'
@@ -13,6 +13,20 @@ afterEach(() => {
 })
 
 describe('title typography', () => {
+  function mockReducedMotion(reduce: boolean) {
+    window.matchMedia = jest.fn().mockImplementation((query: string) => ({
+      matches: query.includes('prefers-reduced-motion') && reduce,
+      media: query,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    })) as unknown as typeof window.matchMedia
+  }
+
+  afterEach(() => {
+    jest.useRealTimers()
+    jest.restoreAllMocks()
+  })
+
   it('uses larger semibold title styles on the selection screen', () => {
     render(
       <SelectionScreen
@@ -40,6 +54,39 @@ describe('title typography', () => {
     expect(within(screen.getByRole('button', { name: 'Como rezar' })).getByText('?')).toHaveClass(
       'text-gold'
     )
+  })
+
+  it('animates the selection title without changing its accessible name', () => {
+    mockReducedMotion(false)
+    jest.useFakeTimers()
+
+    render(
+      <SelectionScreen
+        savedProgress={null}
+        progressLayout="linear"
+        onSelectMisterio={jest.fn()}
+        onResume={jest.fn()}
+        onDismissProgress={jest.fn()}
+        onProgressLayoutChange={jest.fn()}
+        onShowWelcome={jest.fn()}
+      />
+    )
+
+    const heading = screen.getByRole('heading', { name: 'Reze o Terço' })
+    expect(heading).toHaveTextContent('Reze o Terço')
+    expect(screen.getByTestId('selection-title-caret')).toBeInTheDocument()
+
+    act(() => {
+      jest.advanceTimersByTime(2400)
+    })
+    for (let step = 0; step < 4; step++) {
+      act(() => {
+        jest.advanceTimersByTime(55)
+      })
+    }
+
+    expect(heading).not.toHaveTextContent('Reze o Terço')
+    expect(screen.getByRole('heading', { name: 'Reze o Terço' })).toBe(heading)
   })
 
   it('uses larger semibold title styles while praying', () => {
