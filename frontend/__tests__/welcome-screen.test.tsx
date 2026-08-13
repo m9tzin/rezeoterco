@@ -6,12 +6,10 @@ describe('WelcomeScreen', () => {
     render(<WelcomeScreen hasSavedProgress={false} onStart={jest.fn()} onResume={jest.fn()} />)
 
     expect(screen.getByText('Vídeo demonstrativo em breve')).toBeInTheDocument()
-    expect(
-      screen.queryByLabelText('Vídeo demonstrativo: como rezar o terço')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByTestId('demo-video')).not.toBeInTheDocument()
   })
 
-  it('renders a configured video URL as a native player', () => {
+  it('renders a configured video URL as an autoplaying, muted, looping loop', () => {
     render(
       <WelcomeScreen
         hasSavedProgress={false}
@@ -21,11 +19,13 @@ describe('WelcomeScreen', () => {
       />
     )
 
-    const video = screen.getByLabelText('Vídeo demonstrativo: como rezar o terço')
+    const video = screen.getByTestId('demo-video')
     expect(video.tagName).toBe('VIDEO')
     expect(video).toHaveAttribute('src', 'https://example.public.blob.vercel-storage.com/demo.mp4')
-    expect(video).toHaveAttribute('preload', 'none')
-    expect(video).toHaveAttribute('controls')
+    expect(video).toHaveAttribute('autoplay')
+    expect((video as HTMLVideoElement).muted).toBe(true)
+    expect(video).toHaveAttribute('loop')
+    expect(video).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('calls the start action from the primary CTA', () => {

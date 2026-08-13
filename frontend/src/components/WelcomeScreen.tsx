@@ -46,10 +46,13 @@ export function WelcomeScreen({
           <div className="aspect-video w-full overflow-hidden rounded-sm border border-parchment bg-white shadow-[0_2px_16px_rgba(92,61,46,0.07)]">
             <video
               src={videoUrl}
-              controls
-              preload="none"
+              autoPlay
+              muted
+              loop
               playsInline
-              aria-label="Vídeo demonstrativo: como rezar o terço"
+              preload="auto"
+              aria-hidden="true"
+              data-testid="demo-video"
               className="h-full w-full"
             />
           </div>
