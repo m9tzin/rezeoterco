@@ -1,22 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { RosaryLogo } from './RosaryLogo'
+import { TopNav } from './TopNav'
+import { TypewriterTitle } from './TypewriterTitle'
 
 type Props = {
   hasSavedProgress: boolean
   onStart: () => void
   onResume: () => void
+  onShowWelcome?: () => void
   demoVideoUrl?: string
 }
 
 const DEMO_VIDEO_URL = process.env.NEXT_PUBLIC_DEMO_VIDEO_URL ?? ''
-
-const TITLE = 'Reze o Terço'
-const TYPE_MS = 130
-const DELETE_MS = 55
-const HOLD_FULL_MS = 2400
-const HOLD_EMPTY_MS = 700
 
 function normalizeVideoUrl(url: string): string {
   if (!url.includes('loom.com/share/')) return url
@@ -24,76 +20,11 @@ function normalizeVideoUrl(url: string): string {
   return url.replace('loom.com/share/', 'loom.com/embed/').split('?')[0]
 }
 
-/**
- * Types the title out, holds it, erases it and starts over.
- *
- * The heading renders complete on the server and on first paint, and only starts
- * cycling once mounted — so there is no flash of empty heading, and readers that
- * never run the effect still see the whole title. The accessible name is pinned
- * with `aria-label`, so assistive tech announces the full title at any point in
- * the cycle rather than whatever fragment is on screen.
- */
-function TypewriterTitle() {
-  const [animated, setAnimated] = useState(false)
-  const [count, setCount] = useState(TITLE.length)
-  const [erasing, setErasing] = useState(false)
-
-  useEffect(() => {
-    if (typeof window.matchMedia !== 'function') return
-
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const sync = () => setAnimated(!query.matches)
-
-    sync()
-    query.addEventListener('change', sync)
-    return () => query.removeEventListener('change', sync)
-  }, [])
-
-  useEffect(() => {
-    if (!animated) {
-      setCount(TITLE.length)
-      setErasing(false)
-      return
-    }
-
-    const done = erasing ? count === 0 : count === TITLE.length
-    const delay = done
-      ? erasing
-        ? HOLD_EMPTY_MS
-        : HOLD_FULL_MS
-      : erasing
-        ? DELETE_MS
-        : TYPE_MS
-
-    const timer = setTimeout(() => {
-      if (done) setErasing(!erasing)
-      else setCount(erasing ? count - 1 : count + 1)
-    }, delay)
-
-    return () => clearTimeout(timer)
-  }, [animated, count, erasing])
-
-  return (
-    <h1
-      aria-label={TITLE}
-      className="font-cormorant font-semibold text-[2.75rem] leading-tight text-brown tracking-widest uppercase mb-3"
-    >
-      <span aria-hidden="true">{TITLE.slice(0, count)}</span>
-      {animated && (
-        <span
-          aria-hidden="true"
-          data-testid="welcome-title-caret"
-          className="ml-1 inline-block h-[0.8em] w-[3px] translate-y-[0.06em] bg-gold/70 animate-pulse"
-        />
-      )}
-    </h1>
-  )
-}
-
 export function WelcomeScreen({
   hasSavedProgress,
   onStart,
   onResume,
+  onShowWelcome = () => {},
   demoVideoUrl = DEMO_VIDEO_URL,
 }: Props) {
   const videoUrl = normalizeVideoUrl(demoVideoUrl.trim())
@@ -101,21 +32,15 @@ export function WelcomeScreen({
   return (
     <div className="bg-cream flex flex-col items-center px-4 pb-10">
       <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl pt-10 pb-7">
-        <div className="flex justify-end mb-6">
-          <button
-            type="button"
-            onClick={onStart}
-            className="font-cormorant text-base text-terco-muted hover:text-brown transition-colors min-h-[44px] px-3 inline-flex items-center gap-2"
-          >
-            <RosaryLogo width={13} className="shrink-0 opacity-80" />
-            Menu
-          </button>
-        </div>
+        <TopNav onShowSelection={onStart} onShowWelcome={onShowWelcome} />
 
         <div className="text-center">
           <RosaryLogo width={40} className="text-brown mx-auto mb-6" />
 
-          <TypewriterTitle />
+          <TypewriterTitle
+            caretTestId="welcome-title-caret"
+            className="font-cormorant font-semibold text-[2.75rem] leading-tight text-brown tracking-widest uppercase mb-3"
+          />
           <p className="font-garamond italic text-terco-muted text-lg leading-relaxed max-w-xl mx-auto">
             Um guia simples para acompanhar cada oração, mistério e conta com calma.
           </p>

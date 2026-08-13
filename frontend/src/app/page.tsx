@@ -12,7 +12,7 @@ import { CompletionScreen } from '@/components/CompletionScreen'
 type View = 'welcome' | 'selection' | 'praying' | 'complete'
 
 export default function Home() {
-  const [view, setView] = useState<View>('welcome')
+  const [view, setView] = useState<View>('selection')
   const [tipo, setTipo] = useState<TipoTerco>('mariano')
   const [misterioId, setMisterioId] = useState<string>('gozosos')
   const [etapaIndex, setEtapaIndex] = useState(0)
@@ -103,6 +103,7 @@ export default function Home() {
             hasSavedProgress={Boolean(savedProgress)}
             onStart={handleStartSelection}
             onResume={handleResume}
+            onShowWelcome={() => setView('welcome')}
           />
         )}
         {view === 'selection' && (
@@ -113,6 +114,7 @@ export default function Home() {
             onResume={handleResume}
             onDismissProgress={handleDismissProgress}
             onProgressLayoutChange={handleProgressLayoutChange}
+            onShowSelection={handleStartSelection}
             onShowWelcome={() => setView('welcome')}
           />
         )}

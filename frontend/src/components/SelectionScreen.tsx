@@ -5,6 +5,8 @@ import type { TipoTerco, Progress, ProgressLayout } from '@/data/types'
 import { TERCOS, TERCO_LIST } from '@/data/index'
 import { VerseOfDay } from './VerseOfDay'
 import { RosaryLogo } from './RosaryLogo'
+import { TopNav } from './TopNav'
+import { TypewriterTitle } from './TypewriterTitle'
 
 type Props = {
   savedProgress: Progress | null
@@ -13,6 +15,7 @@ type Props = {
   onResume: () => void
   onDismissProgress: () => void
   onProgressLayoutChange: (layout: ProgressLayout) => void
+  onShowSelection?: () => void
   onShowWelcome: () => void
 }
 
@@ -92,6 +95,7 @@ export function SelectionScreen({
   onResume,
   onDismissProgress,
   onProgressLayoutChange,
+  onShowSelection = () => {},
   onShowWelcome,
 }: Props) {
   const [activeTipo, setActiveTipo] = useState<TipoTerco>(savedProgress?.tipo ?? 'mariano')
@@ -106,30 +110,16 @@ export function SelectionScreen({
   return (
     <div className="bg-cream flex flex-col items-center px-4 pb-8">
       {/* Hero */}
-      <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl text-center pt-14 pb-8">
-        <div className="flex justify-end mb-3">
-          <button
-            type="button"
-            onClick={onShowWelcome}
-            aria-label="Como rezar"
-            className="inline-flex items-center gap-2 font-cormorant text-base text-terco-muted hover:text-brown transition-colors min-h-[44px] px-3"
-          >
-            <span
-              className="flex h-5 w-5 items-center justify-center rounded-full border border-gold/50 bg-white/60 font-cormorant text-sm text-gold"
-              aria-hidden="true"
-            >
-              ?
-            </span>
-            Como rezar
-          </button>
-        </div>
+      <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl text-center pt-10 pb-8">
+        <TopNav onShowSelection={onShowSelection} onShowWelcome={onShowWelcome} />
 
         <RosaryLogo width={40} className="text-brown mx-auto mb-6" />
 
         <div className="flex items-center justify-center gap-2 mb-3">
-          <h1 className="font-cormorant font-semibold text-[2.75rem] leading-tight text-brown tracking-widest uppercase">
-            Reze o Terço
-          </h1>
+          <TypewriterTitle
+            caretTestId="selection-title-caret"
+            className="font-cormorant font-semibold text-[2.75rem] leading-tight text-brown tracking-widest uppercase"
+          />
           <span className="font-geist text-[10px] text-terco-muted/60 border border-terco-muted/25 rounded px-1.5 py-0.5 tracking-widest uppercase self-start mt-3">
             beta
           </span>
