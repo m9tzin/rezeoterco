@@ -88,6 +88,11 @@ function getTodayMisterioId(): string {
   return map[new Date().getDay()]
 }
 
+function getDefaultMisterioId(tipo: TipoTerco): string {
+  if (tipo === 'mariano') return getTodayMisterioId()
+  return TERCOS[tipo].misterios[0].id
+}
+
 export function SelectionScreen({
   savedProgress,
   progressLayout,
@@ -99,13 +104,25 @@ export function SelectionScreen({
   onShowWelcome,
 }: Props) {
   const [activeTipo, setActiveTipo] = useState<TipoTerco>(savedProgress?.tipo ?? 'mariano')
+  const [selectedMisterioId, setSelectedMisterioId] = useState<string>(
+    savedProgress?.misterioId ?? getDefaultMisterioId(savedProgress?.tipo ?? 'mariano')
+  )
   const activeTerco = TERCOS[activeTipo]
   const todayId = getTodayMisterioId()
   const hasMultipleOptions = activeTerco.misterios.length > 1
+  const selectedMisterio =
+    activeTerco.misterios.find((m) => m.id === selectedMisterioId) ?? activeTerco.misterios[0]
 
   useEffect(() => {
-    if (savedProgress) setActiveTipo(savedProgress.tipo)
+    if (!savedProgress) return
+    setActiveTipo(savedProgress.tipo)
+    setSelectedMisterioId(savedProgress.misterioId)
   }, [savedProgress])
+
+  function handleSelectTipo(tipo: TipoTerco) {
+    setActiveTipo(tipo)
+    setSelectedMisterioId(getDefaultMisterioId(tipo))
+  }
 
   return (
     <div className="bg-cream flex flex-col items-center px-4 pb-8">
@@ -196,14 +213,8 @@ export function SelectionScreen({
           {TERCO_LIST.map((terco) => (
             <button
               key={terco.id}
-              onClick={() => {
-                if (TERCOS[terco.id].misterios.length === 1) {
-                  const firstMisterio = TERCOS[terco.id].misterios[0]
-                  onSelectMisterio(terco.id, firstMisterio.id)
-                  return
-                }
-                setActiveTipo(terco.id)
-              }}
+              onClick={() => handleSelectTipo(terco.id)}
+              aria-pressed={activeTipo === terco.id}
               className={`font-cormorant px-5 min-h-[44px] rounded-sm text-base border transition-all duration-200 motion-safe:ease-out active:scale-[0.97] [@media(hover:hover)]:hover:-translate-y-0.5 ${
                 activeTipo === terco.id
                   ? 'bg-brown text-cream border-brown shadow-[0_2px_8px_rgba(92,61,46,0.18)] [@media(hover:hover)]:hover:shadow-[0_4px_12px_rgba(92,61,46,0.2)]'
@@ -237,14 +248,19 @@ export function SelectionScreen({
             {activeTerco.misterios.map((misterio) => {
               const vis = MISTERIO_VISUAL[misterio.id]
               const isToday = activeTipo === 'mariano' && misterio.id === todayId
+              const isSelected = misterio.id === selectedMisterio?.id
+              const accentColor = vis?.cor ?? '#9a7b3f'
               return (
                 <button
                   key={misterio.id}
-                  onClick={() => onSelectMisterio(activeTipo, misterio.id)}
-                  className={`w-full text-left flex items-center gap-4 px-5 py-4 border bg-white hover:bg-[#faf8f3] transition-all duration-200 motion-safe:ease-out rounded-sm active:scale-[0.99] group shadow-[0_1px_4px_rgba(92,61,46,0.05)] [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_5px_16px_rgba(92,61,46,0.12)] ${
-                    isToday ? 'border-[1.5px]' : 'border-parchment'
+                  onClick={() => setSelectedMisterioId(misterio.id)}
+                  aria-pressed={isSelected}
+                  className={`w-full text-left flex items-center gap-4 px-5 py-4 border transition-all duration-200 motion-safe:ease-out rounded-sm active:scale-[0.99] group shadow-[0_1px_4px_rgba(92,61,46,0.05)] [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_5px_16px_rgba(92,61,46,0.12)] ${
+                    isSelected
+                      ? 'border-[1.5px] bg-[#faf8f3] shadow-[0_4px_14px_rgba(92,61,46,0.12)]'
+                      : `bg-white hover:bg-[#faf8f3] ${isToday ? 'border-[1.5px]' : 'border-parchment'}`
                   }`}
-                  style={isToday ? { borderColor: vis?.cor } : undefined}
+                  style={isSelected || isToday ? { borderColor: accentColor } : undefined}
                   aria-label={`${misterio.titulo}${isToday ? ' — recomendado para hoje' : ''}`}
                 >
                   {/* Colored accent bar */}
@@ -286,21 +302,33 @@ export function SelectionScreen({
                     </p>
                   </div>
 
-                  {/* Arrow icon */}
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-parchment group-hover:text-gold transition-colors shrink-0"
+                  {/* Selection indicator */}
+                  <span
+                    className={`w-5 h-5 shrink-0 rounded-full border flex items-center justify-center transition-colors ${
+                      isSelected ? 'text-white' : 'border-parchment group-hover:border-gold'
+                    }`}
+                    style={
+                      isSelected
+                        ? { backgroundColor: accentColor, borderColor: accentColor }
+                        : undefined
+                    }
                     aria-hidden="true"
                   >
-                    <path d="M3 8h10M9 4l4 4-4 4" />
-                  </svg>
+                    {isSelected && (
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M3.5 8.5l3 3 6-7" />
+                      </svg>
+                    )}
+                  </span>
                 </button>
               )
             })}
@@ -308,20 +336,21 @@ export function SelectionScreen({
         </div>
       )}
 
-      {/* Single-sequence CTA */}
-      {!hasMultipleOptions && (
-        <div className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl mt-2">
-          <button
-            onClick={() => {
-              const misterio = TERCOS[activeTipo].misterios[0]
-              onSelectMisterio(activeTipo, misterio.id)
-            }}
-            className="w-full min-h-[52px] font-cormorant text-lg tracking-wide bg-brown text-cream rounded-sm hover:bg-brown-dark transition-colors active:scale-[0.97] shadow-[0_2px_12px_rgba(92,61,46,0.18)]"
-          >
-            Começar →
-          </button>
-        </div>
-      )}
+      {/* Start CTA */}
+      <div className={`w-full max-w-lg md:max-w-2xl lg:max-w-3xl ${hasMultipleOptions ? 'mt-6' : 'mt-2'}`}>
+        <button
+          onClick={() => {
+            if (!selectedMisterio) return
+            onSelectMisterio(activeTipo, selectedMisterio.id)
+          }}
+          className="w-full min-h-[52px] font-cormorant text-lg tracking-wide bg-brown text-cream rounded-sm hover:bg-brown-dark transition-colors active:scale-[0.97] shadow-[0_2px_12px_rgba(92,61,46,0.18)]"
+        >
+          Começar →
+        </button>
+        <p className="font-garamond italic text-terco-muted text-sm text-center mt-2">
+          {hasMultipleOptions ? selectedMisterio?.titulo : activeTerco.nome}
+        </p>
+      </div>
     </div>
   )
 }

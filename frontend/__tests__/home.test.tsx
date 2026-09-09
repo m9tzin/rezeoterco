@@ -17,6 +17,10 @@ async function goToSelection() {
   expect(await screen.findByText('Versículo do dia')).toBeInTheDocument()
 }
 
+function clickStart() {
+  fireEvent.click(screen.getByRole('button', { name: 'Começar →' }))
+}
+
 describe('Home prayer flow', () => {
   it('shows devotional choices as the initial screen', async () => {
     render(<Home />)
@@ -26,6 +30,32 @@ describe('Home prayer flow', () => {
     expect(screen.queryByText('Como rezar em poucos passos')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Menu' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Como rezar' })).toBeInTheDocument()
+  })
+
+  it('only starts the terço after the user clicks Começar', async () => {
+    render(<Home />)
+
+    await goToSelection()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Terço da Libertação' }))
+    expect(screen.queryByText('Sinal da Cruz')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Terço da Libertação' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Terço Mariano' }))
+    fireEvent.click(screen.getByRole('button', { name: /Mistérios Dolorosos/ }))
+    expect(screen.queryByText('Credo')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Mistérios Dolorosos/ })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
+
+    clickStart()
+
+    expect(screen.getByText('Mistérios Dolorosos')).toBeInTheDocument()
+    expect(screen.getByText('Credo')).toBeInTheDocument()
   })
 
   it('opens the tutorial from home and returns to home through the navbar', async () => {
@@ -62,6 +92,7 @@ describe('Home prayer flow', () => {
     await goToSelection()
 
     fireEvent.click(await screen.findByRole('button', { name: /Mistérios Gozosos/ }))
+    clickStart()
     expect(screen.getByText('Credo')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Próxima etapa' }))
@@ -88,6 +119,7 @@ describe('Home prayer flow', () => {
     await goToSelection()
 
     fireEvent.click(await screen.findByRole('button', { name: /Mistérios Gozosos/ }))
+    clickStart()
     expect(screen.getByText('Credo')).toBeInTheDocument()
 
     const lowerBackButton = screen.getByRole('button', { name: 'Voltar à tela inicial' })
@@ -110,6 +142,7 @@ describe('Home prayer flow', () => {
     await goToSelection()
 
     fireEvent.click(await screen.findByRole('button', { name: /Mistérios Gozosos/ }))
+    clickStart()
     expect(screen.getByText('Credo')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Próxima etapa' }))
@@ -142,6 +175,7 @@ describe('Home prayer flow', () => {
     ).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Novena de Santo Antônio' }))
+    clickStart()
 
     expect(screen.getByText('Novena de Santo Antônio')).toBeInTheDocument()
     expect(screen.getByText('Dia 1/9 — Fé')).toBeInTheDocument()
@@ -180,6 +214,7 @@ describe('Home prayer flow', () => {
 
     await goToSelection()
     fireEvent.click(await screen.findByRole('button', { name: 'Terço da Libertação' }))
+    clickStart()
 
     expect(screen.getByText('Terço da Libertação')).toBeInTheDocument()
     expect(screen.getByText('Sinal da Cruz')).toBeInTheDocument()
@@ -193,6 +228,7 @@ describe('Home prayer flow', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Voltar ao início' }))
     fireEvent.click(screen.getByRole('button', { name: 'Terço das Santas Chagas' }))
+    clickStart()
 
     expect(screen.getByText('Terço das Santas Chagas')).toBeInTheDocument()
     expect(screen.getByText('Sinal da Cruz')).toBeInTheDocument()
@@ -216,6 +252,7 @@ describe('Home prayer flow', () => {
     })
 
     fireEvent.click(screen.getByRole('button', { name: /Mistérios Gozosos/ }))
+    clickStart()
 
     expect(screen.getByTestId('progress-terco-layout')).toBeInTheDocument()
     expect(screen.queryByTestId('progress-linear-layout')).not.toBeInTheDocument()
@@ -226,6 +263,7 @@ describe('Home prayer flow', () => {
 
     await goToSelection()
     fireEvent.click(await screen.findByRole('button', { name: /Mistérios Gozosos/ }))
+    clickStart()
 
     fireEvent.click(screen.getByRole('button', { name: 'Próxima etapa' }))
     act(() => {
