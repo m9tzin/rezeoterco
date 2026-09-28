@@ -1,15 +1,26 @@
 'use client'
 
-import { useEffect, useId, useRef, useState } from 'react'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 
 // A campanha termina no Dia das Crianças; no dia 13/10 o banner some sozinho.
 const CAMPAIGN_END = new Date('2026-10-13T00:00:00-03:00')
 const PIX_EMAIL = 'joaoalvez916@gmail.com'
 
-type Props = {
-  /** Sobe o selo móvel para não cobrir a navegação fixa da tela de oração. */
-  raised?: boolean
+function isCampaignActive() {
+  return Date.now() < CAMPAIGN_END.getTime()
 }
+
+type OpenDonation = (trigger: HTMLElement) => void
+
+const DonationContext = createContext<OpenDonation | null>(null)
 
 const CRAYON_GREEN = '#3d9a40'
 
@@ -66,10 +77,21 @@ const CRAYON_CIRCLES = {
     viewBox: '0 0 240 120',
     d: 'M34 10 C96 0, 196 2, 228 20 C244 32, 242 94, 216 110 C170 122, 56 122, 16 110 C-2 98, -2 30, 22 14 C40 4, 72 3, 100 5',
   },
+  nav: {
+    viewBox: '0 0 200 40',
+    d: 'M24 5 C80 0, 160 1, 188 8 C200 14, 198 30, 180 36 C140 42, 50 41, 16 35 C0 29, 2 11, 20 6 C34 3, 56 2, 76 3',
+  },
   pill: {
     viewBox: '0 0 200 50',
     d: 'M26 6 C80 0, 160 1, 188 10 C200 18, 198 38, 180 45 C140 52, 50 51, 16 43 C0 36, 2 14, 20 8 C34 4, 56 3, 76 4',
   },
+}
+
+// Tamanho explícito: um SVG absoluto sem altura mantém a proporção do viewBox e não acompanha o texto.
+const CIRCLE_INSETS: Record<keyof typeof CRAYON_CIRCLES, string> = {
+  card: '-left-5 -top-5 w-[calc(100%+2.5rem)] h-[calc(100%+2.5rem)]',
+  nav: '-left-2 -top-1.5 w-[calc(100%+1rem)] h-[calc(100%+0.75rem)]',
+  pill: '-left-2.5 -top-2 w-[calc(100%+1.25rem)] h-[calc(100%+1rem)]',
 }
 
 function CrayonCircle({ variant }: { variant: keyof typeof CRAYON_CIRCLES }) {
@@ -82,7 +104,7 @@ function CrayonCircle({ variant }: { variant: keyof typeof CRAYON_CIRCLES }) {
       viewBox={viewBox}
       preserveAspectRatio="none"
       className={`pointer-events-none absolute overflow-visible ${
-        variant === 'card' ? '-inset-x-5 -inset-y-5' : '-inset-x-2.5 -inset-y-2'
+        CIRCLE_INSETS[variant]
       }`}
     >
       <defs>
@@ -103,11 +125,15 @@ function CrayonCircle({ variant }: { variant: keyof typeof CRAYON_CIRCLES }) {
   )
 }
 
-export function DonationBanner({ raised = false }: Props) {
+/**
+ * Guarda o popup do flyer e deixa qualquer botão da página abri-lo,
+ * como o atalho do Dia das Crianças na barra de navegação.
+ */
+export function DonationProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const closeRef = useRef<HTMLButtonElement>(null)
-  const triggerRef = useRef<HTMLButtonElement | null>(null)
+  const triggerRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (!open) return
@@ -125,10 +151,8 @@ export function DonationBanner({ raised = false }: Props) {
     return () => clearTimeout(timer)
   }, [copied])
 
-  if (Date.now() >= CAMPAIGN_END.getTime()) return null
-
-  function handleOpen(event: React.MouseEvent<HTMLButtonElement>) {
-    triggerRef.current = event.currentTarget
+  function handleOpen(trigger: HTMLElement) {
+    triggerRef.current = trigger
     setOpen(true)
   }
 
@@ -147,34 +171,8 @@ export function DonationBanner({ raised = false }: Props) {
   }
 
   return (
-    <>
-      {/* Desktop: aviso solto na margem lateral direita */}
-      <button
-        type="button"
-        onClick={handleOpen}
-        className="hidden xl:block fixed right-6 top-28 z-20 w-52 text-left px-4 py-3 transition-transform duration-200 motion-safe:ease-out [@media(hover:hover)]:hover:-translate-y-0.5"
-      >
-        <CrayonCircle variant="card" />
-        <span className="block font-geist text-[15px] font-medium leading-snug text-terco-text">
-          Clique aqui para <Ajude>ajudar</Ajude> no Dia das Crianças
-        </span>
-        <span className="mt-1.5 block font-geist text-[13px] leading-snug text-terco-muted">
-          Arrecadação do Segue-me até 12 de outubro →
-        </span>
-      </button>
-
-      {/* Celular/tablet: selo compacto */}
-      <button
-        type="button"
-        onClick={handleOpen}
-        className={`xl:hidden fixed right-4 z-20 rounded-full px-3 min-h-[36px] bg-cream/90 font-geist text-xs text-terco-text transition-all duration-200 active:scale-[0.97] ${
-          raised ? 'bottom-24' : 'bottom-4'
-        }`}
-      >
-        <CrayonCircle variant="pill" />
-        Toque aqui para <Ajude>ajudar</Ajude> no Dia das Crianças
-      </button>
-
+    <DonationContext.Provider value={isCampaignActive() ? handleOpen : null}>
+      {children}
       {open && (
         <div
           data-testid="donation-backdrop"
@@ -217,6 +215,74 @@ export function DonationBanner({ raised = false }: Props) {
           </div>
         </div>
       )}
+    </DonationContext.Provider>
+  )
+}
+
+type BannerProps = {
+  /** Mostra o selo flutuante no celular, nas telas que não têm a barra de navegação. */
+  showMobileBadge?: boolean
+  /** Sobe o selo móvel para não cobrir a navegação fixa da tela de oração. */
+  raised?: boolean
+}
+
+export function DonationBanner({ showMobileBadge = false, raised = false }: BannerProps) {
+  const openDonation = useContext(DonationContext)
+  if (!openDonation) return null
+
+  return (
+    <>
+      {/* Desktop: aviso solto na margem lateral direita */}
+      <button
+        type="button"
+        onClick={(event) => openDonation(event.currentTarget)}
+        className="hidden xl:block fixed right-6 top-28 z-20 w-52 text-left px-4 py-3 transition-transform duration-200 motion-safe:ease-out [@media(hover:hover)]:hover:-translate-y-0.5"
+      >
+        <CrayonCircle variant="card" />
+        <span className="block font-geist text-[15px] font-medium leading-snug text-terco-text">
+          Clique aqui para <Ajude>ajudar</Ajude> no Dia das Crianças
+        </span>
+        <span className="mt-1.5 block font-geist text-[13px] leading-snug text-terco-muted">
+          Arrecadação do Segue-me até 12 de outubro →
+        </span>
+      </button>
+
+      {/* Celular/tablet sem barra de navegação: selo compacto */}
+      {showMobileBadge && (
+        <button
+          type="button"
+          onClick={(event) => openDonation(event.currentTarget)}
+          className={`xl:hidden fixed right-4 z-20 rounded-full px-3 min-h-[36px] bg-cream/90 font-geist text-xs text-terco-text transition-all duration-200 active:scale-[0.97] ${
+            raised ? 'bottom-24' : 'bottom-4'
+          }`}
+        >
+          <CrayonCircle variant="pill" />
+          Toque aqui para <Ajude>ajudar</Ajude> no Dia das Crianças
+        </button>
+      )}
     </>
+  )
+}
+
+/** Atalho do Dia das Crianças na barra de navegação, só no celular/tablet. */
+export function DonationNavButton() {
+  const openDonation = useContext(DonationContext)
+  if (!openDonation) return null
+
+  return (
+    <button
+      type="button"
+      onClick={(event) => openDonation(event.currentTarget)}
+      className="xl:hidden mr-auto min-h-[44px] px-1 inline-flex items-center whitespace-nowrap font-geist text-[11px] leading-tight sm:text-xs text-terco-text active:scale-[0.97] transition-transform"
+    >
+      {/* No celular o texto quebra em duas linhas para caber ao lado de Menu e Como rezar */}
+      <span className="relative inline-block px-1 py-0.5 text-center sm:px-1 sm:py-1">
+        <CrayonCircle variant="nav" />
+        <span className="block sm:inline">
+          Clique aqui e <Ajude>ajude</Ajude>
+        </span>{' '}
+        <span className="block sm:inline">no Dia das Crianças!</span>
+      </span>
+    </button>
   )
 }

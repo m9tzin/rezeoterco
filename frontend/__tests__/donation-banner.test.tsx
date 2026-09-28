@@ -1,5 +1,16 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
-import { DonationBanner } from '@/components/DonationBanner'
+import { DonationBanner, DonationNavButton, DonationProvider } from '@/components/DonationBanner'
+import { TopNav } from '@/components/TopNav'
+
+const TRIGGER = /ajudar no Dia das Crianças/
+
+function renderBanner(props: Parameters<typeof DonationBanner>[0] = {}) {
+  return render(
+    <DonationProvider>
+      <DonationBanner {...props} />
+    </DonationProvider>
+  )
+}
 
 describe('DonationBanner', () => {
   beforeEach(() => {
@@ -10,46 +21,42 @@ describe('DonationBanner', () => {
     jest.useRealTimers()
   })
 
-  it('shows the desktop card and the compact mobile badge during the campaign', () => {
-    render(<DonationBanner />)
+  it('shows only the desktop card by default', () => {
+    renderBanner()
 
-    const triggers = screen.getAllByRole('button', {
-      name: /aqui para ajudar no Dia das Crianças/,
-    })
-    expect(triggers).toHaveLength(2)
-    expect(triggers[0]).toHaveClass('hidden', 'xl:block')
-    expect(triggers[0]).toHaveTextContent('Clique aqui para ajudar no Dia das Crianças')
-    expect(triggers[1]).toHaveTextContent('Toque aqui para ajudar no Dia das Crianças')
-    expect(triggers[1]).toHaveClass('xl:hidden', 'bottom-4')
-    for (const trigger of triggers) {
-      expect(trigger.querySelector('[data-testid="donation-crayon-circle"] path')).toHaveAttribute(
-        'stroke',
-        '#3d9a40'
-      )
-    }
+    const [card] = screen.getAllByRole('button', { name: TRIGGER })
+    expect(screen.getAllByRole('button', { name: TRIGGER })).toHaveLength(1)
+    expect(card).toHaveClass('hidden', 'xl:block')
+    expect(card).toHaveTextContent('Clique aqui para ajudar no Dia das Crianças')
+    expect(card.querySelector('[data-testid="donation-crayon-circle"] path')).toHaveAttribute(
+      'stroke',
+      '#3d9a40'
+    )
   })
 
-  it('raises the mobile badge above the prayer navigation', () => {
-    render(<DonationBanner raised />)
+  it('adds the mobile badge, raised above the prayer navigation', () => {
+    renderBanner({ showMobileBadge: true, raised: true })
 
-    const [, badge] = screen.getAllByRole('button', {
-      name: /aqui para ajudar no Dia das Crianças/,
-    })
-    expect(badge).toHaveClass('bottom-24')
+    const [, badge] = screen.getAllByRole('button', { name: TRIGGER })
+    expect(badge).toHaveClass('xl:hidden', 'bottom-24')
+    expect(badge).toHaveTextContent('Toque aqui para ajudar no Dia das Crianças')
   })
 
   it('disappears after Dia das Crianças', () => {
     jest.setSystemTime(new Date('2026-10-13T00:00:00-03:00'))
-    const { container } = render(<DonationBanner />)
+    render(
+      <DonationProvider>
+        <DonationBanner showMobileBadge />
+        <DonationNavButton />
+      </DonationProvider>
+    )
 
-    expect(container).toBeEmptyDOMElement()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
   it('opens the flyer popup and closes it with the button, Escape and the backdrop', () => {
-    render(<DonationBanner />)
-    const [trigger] = screen.getAllByRole('button', {
-      name: /aqui para ajudar no Dia das Crianças/,
-    })
+    renderBanner()
+    const [trigger] = screen.getAllByRole('button', { name: TRIGGER })
 
     fireEvent.click(trigger)
     const dialog = screen.getByRole('dialog', { name: 'Arrecadação Dia das Crianças' })
@@ -75,16 +82,32 @@ describe('DonationBanner', () => {
   it('copies the PIX e-mail', async () => {
     const writeText = jest.fn().mockResolvedValue(undefined)
     Object.assign(navigator, { clipboard: { writeText } })
-    render(<DonationBanner />)
+    renderBanner()
 
-    fireEvent.click(
-      screen.getAllByRole('button', { name: /aqui para ajudar no Dia das Crianças/ })[0]
-    )
+    fireEvent.click(screen.getAllByRole('button', { name: TRIGGER })[0])
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Copiar' }))
     })
 
     expect(writeText).toHaveBeenCalledWith('joaoalvez916@gmail.com')
     expect(screen.getByRole('button', { name: 'Copiado' })).toBeInTheDocument()
+  })
+
+  it('puts a circled mobile shortcut in the top navigation that opens the popup', () => {
+    render(
+      <DonationProvider>
+        <TopNav onShowSelection={jest.fn()} onShowWelcome={jest.fn()} />
+      </DonationProvider>
+    )
+
+    const shortcut = screen.getByRole('button', { name: 'Clique aqui e ajude no Dia das Crianças!' })
+    expect(screen.getByRole('navigation', { name: 'Navegação principal' })).toContainElement(
+      shortcut
+    )
+    expect(shortcut).toHaveClass('xl:hidden', 'min-h-[44px]')
+    expect(shortcut.querySelector('[data-testid="donation-crayon-circle"]')).toBeInTheDocument()
+
+    fireEvent.click(shortcut)
+    expect(screen.getByRole('dialog', { name: 'Arrecadação Dia das Crianças' })).toBeInTheDocument()
   })
 })
