@@ -8,6 +8,7 @@ import { WelcomeScreen } from '@/components/WelcomeScreen'
 import { SelectionScreen } from '@/components/SelectionScreen'
 import { PrayerScreen } from '@/components/PrayerScreen'
 import { CompletionScreen } from '@/components/CompletionScreen'
+import { DonationBanner } from '@/components/DonationBanner'
 
 type View = 'welcome' | 'selection' | 'praying' | 'complete'
 
@@ -148,6 +149,8 @@ export default function Home() {
           </a>
         </p>
       </footer>
+
+      <DonationBanner raised={view === 'praying'} />
     </div>
   )
 }
